@@ -19,5 +19,5 @@ const CONFIG = {
   // Feature flags
   ENABLE_GOOGLE_SHEETS: true,  // Set to false to use hardcoded database only
   ENABLE_USER_SUBMISSIONS: true,  // TRUE: Load from Google Sheets (includes both official and community pickups)
-  ENABLE_SHARE_BUTTON: false,  // Set to true once form template URL is configured
+  ENABLE_SHARE_BUTTON: true,  // TRUE: Show "Share with Community" button (needs GOOGLE_FORM_TEMPLATE_URL)
 };
