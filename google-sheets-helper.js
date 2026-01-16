@@ -89,7 +89,13 @@ async function loadPresetsFromCSV(url, isUserSubmissions = false) {
     // Convert rows to presets
     const presets = rows.map(row => {
       // For user submissions, get the username from the first column
-      const addedBy = isUserSubmissions ? row['Username'] || row['Your username (displayed as "Added by [username]")'] : null;
+      let addedBy = isUserSubmissions ? row['Username'] || row['Your username (displayed as "Added by [username]")'] : null;
+
+      // Skip tag for official/curated entries
+      if (addedBy === 'Official' || addedBy === 'Curated' || addedBy === '') {
+        addedBy = null;
+      }
+
       return csvRowToPreset(row, addedBy);
     }).filter(preset => preset.name && preset.manufacturer); // Filter out invalid entries
 
