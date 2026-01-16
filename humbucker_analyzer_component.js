@@ -1852,10 +1852,16 @@ function HumbuckerAnalyzer() {
                   onClick={() => shareCustomPickupWithCommunity(wizardStep)}
                   disabled={(() => {
                     const currentData = wizardData[`pickup${wizardStep}`];
-                    return !currentData.northPhase || !currentData.southPhase;
+                    // Only require wire colors and phase tests
+                    const hasAllColors = currentData.customColors.northPositive &&
+                                        currentData.customColors.northNegative &&
+                                        currentData.customColors.southPositive &&
+                                        currentData.customColors.southNegative;
+                    const hasPhaseTests = currentData.northPhase && currentData.southPhase;
+                    return !hasAllColors || !hasPhaseTests;
                   })()}
                   className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2"
-                  title="Share this custom pickup with the community database"
+                  title="Share this custom pickup with the community database (brand/name optional)"
                 >
                   <Upload size={20} />
                   Share with Community
