@@ -35,7 +35,8 @@ function HumbuckerAnalyzer() {
   
   // Setup wizard
   const [showSetupWizard, setShowSetupWizard] = useState(true);
-  const [wizardStep, setWizardStep] = useState(1); // 1 or 2 for pickup 1 or 2
+  const [wizardStep, setWizardStep] = useState(0); // 0 = method selection, 1 = pickup 1, 2 = pickup 2
+  const [phaseTestingMethod, setPhaseTestingMethod] = useState('analog'); // 'analog', 'digital', 'naudio'
   const [wizardData, setWizardData] = useState({
     pickup1: {
       preset: '',
@@ -105,6 +106,86 @@ function HumbuckerAnalyzer() {
     'Gray',
     'Bare/Shield'
   ];
+
+  // Phase testing instructions based on selected method
+  const getPhaseInstructions = (method) => {
+    const instructions = {
+      analog: {
+        title: '⚡ Analog Meter Phase Testing Instructions',
+        deviceSetup: [
+          'Set analog meter to lowest DC voltage range',
+          'Analog meters use a moving needle indicator'
+        ],
+        testSteps: [
+          { text: 'RED lead (+) → Connect to coil start wire', highlight: 'red' },
+          { text: 'BLACK lead (−) → Connect to coil finish wire', highlight: 'black' },
+          { text: 'Place screwdriver flat on coil pole pieces', highlight: null },
+          { text: 'Rapidly pull screwdriver off the poles', highlight: 'yellow' },
+          { text: 'Watch needle direction as you pull off', highlight: null }
+        ],
+        question: 'Which direction did the needle move when pulling off?',
+        phaseOptions: [
+          { value: '← Left', label: '← Left', display: '← Left' },
+          { value: '→ Right', label: '→ Right', display: '→ Right' }
+        ],
+        visualNote: 'The yellow arrow direction in the pickup visualizer matches your needle movement direction.',
+        visualMappings: [
+          'Needle moved LEFT = ← Yellow arrow points LEFT in visualizer',
+          'Needle moved RIGHT = → Yellow arrow points RIGHT in visualizer'
+        ]
+      },
+      digital: {
+        title: '⚡ Digital Multimeter Phase Testing Instructions',
+        deviceSetup: [
+          'Set digital multimeter to DC voltage (lowest range)',
+          'Digital meters show positive (+) or negative (-) values'
+        ],
+        testSteps: [
+          { text: 'RED lead (+) → Connect to coil start wire', highlight: 'red' },
+          { text: 'BLACK lead (−) → Connect to coil finish wire', highlight: 'black' },
+          { text: 'Place screwdriver flat on coil pole pieces', highlight: null },
+          { text: 'Rapidly pull screwdriver off the poles', highlight: 'yellow' },
+          { text: 'Watch if voltage reading goes UP or DOWN', highlight: null }
+        ],
+        question: 'Did the voltage go UP (positive) or DOWN (negative) when pulling off?',
+        phaseOptions: [
+          { value: '↓ Down', label: '↓ Down', display: '↓ Down (Negative)' },
+          { value: '↑ Up', label: '↑ Up', display: '↑ Up (Positive)' }
+        ],
+        visualNote: 'DOWN (negative) = LEFT arrow | UP (positive) = RIGHT arrow in the pickup visualizer.',
+        visualMappings: [
+          'Voltage went DOWN = ← Yellow arrow points LEFT in visualizer',
+          'Voltage went UP = → Yellow arrow points RIGHT in visualizer'
+        ]
+      },
+      naudio: {
+        title: '⚡ N-Audio Phase Checker Instructions',
+        deviceSetup: [
+          'Professional pickup phase testing device',
+          'Learn more: N-Audio Guitar Pickup Phase Checker'
+        ],
+        deviceLink: 'https://n-audio.net/guitar-pickup-phase-checker/',
+        testSteps: [
+          { text: 'Connect coil start wire to Phase Checker input', highlight: null },
+          { text: 'Connect coil finish wire to Phase Checker ground', highlight: null },
+          { text: 'Power on the N-Audio Phase Checker device', highlight: null },
+          { text: 'Read the LED indicator color', highlight: null }
+        ],
+        question: 'Which LED lit up on the Phase Checker?',
+        phaseOptions: [
+          { value: '🔴 Red', label: '🔴 Red', display: '🔴 Red (Negative Phase)' },
+          { value: '🟢 Green', label: '🟢 Green', display: '🟢 Green (Positive Phase)' }
+        ],
+        visualNote: 'RED LED = LEFT arrow | GREEN LED = RIGHT arrow in the pickup visualizer.',
+        visualMappings: [
+          'RED LED = ← Yellow arrow points LEFT in visualizer',
+          'GREEN LED = → Yellow arrow points RIGHT in visualizer'
+        ]
+      }
+    };
+
+    return instructions[method] || instructions.analog;
+  };
 
   // Preset database based on official pickup color code charts
   // IMPORTANT: North start (positive/left) = HOT output, South start (positive/left) = GROUND
@@ -1362,10 +1443,125 @@ function HumbuckerAnalyzer() {
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-gray-800 rounded-lg p-8 max-w-3xl w-full my-8">
             <h2 className="text-3xl font-bold text-blue-400 mb-6">
-              Setup Pickup {wizardStep}
+              {wizardStep === 0 ? 'Select Your Phase Testing Method' : `Setup Pickup ${wizardStep}`}
             </h2>
-            
+
+            {/* Step 0: Phase Testing Method Selection */}
+            {wizardStep === 0 && (
+              <div className="space-y-6">
+                <p className="text-gray-300 mb-6">
+                  Choose the device you'll use to test pickup phase. This will customize the instructions throughout the setup wizard.
+                </p>
+
+                {/* Analog Meter Option */}
+                <div
+                  onClick={() => setPhaseTestingMethod('analog')}
+                  className={`cursor-pointer rounded-lg p-6 border-2 transition ${
+                    phaseTestingMethod === 'analog'
+                      ? 'border-blue-500 bg-blue-900'
+                      : 'border-gray-600 bg-gray-700 hover:border-gray-500'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="radio"
+                      checked={phaseTestingMethod === 'analog'}
+                      onChange={() => setPhaseTestingMethod('analog')}
+                      className="mt-1"
+                    />
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-white mb-2">Analog Meter</h3>
+                      <p className="text-gray-300 mb-3">
+                        Traditional analog meter with moving needle. Place screwdriver on poles, rapidly pull off,
+                        and watch which direction the needle swings.
+                      </p>
+                      <div className="text-sm text-gray-400">
+                        Phase indicators: <span className="font-semibold text-white">← Left</span> or <span className="font-semibold text-white">→ Right</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Digital Multimeter Option */}
+                <div
+                  onClick={() => setPhaseTestingMethod('digital')}
+                  className={`cursor-pointer rounded-lg p-6 border-2 transition ${
+                    phaseTestingMethod === 'digital'
+                      ? 'border-blue-500 bg-blue-900'
+                      : 'border-gray-600 bg-gray-700 hover:border-gray-500'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="radio"
+                      checked={phaseTestingMethod === 'digital'}
+                      onChange={() => setPhaseTestingMethod('digital')}
+                      className="mt-1"
+                    />
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-white mb-2">Digital Multimeter</h3>
+                      <p className="text-gray-300 mb-3">
+                        Digital meter showing positive/negative voltage. Pull screwdriver off poles and
+                        watch if voltage goes up (+) or down (-).
+                      </p>
+                      <div className="text-sm text-gray-400">
+                        Phase indicators: <span className="font-semibold text-white">↓ Down (Negative)</span> or <span className="font-semibold text-white">↑ Up (Positive)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* N-Audio Phase Checker Option */}
+                <div
+                  onClick={() => setPhaseTestingMethod('naudio')}
+                  className={`cursor-pointer rounded-lg p-6 border-2 transition ${
+                    phaseTestingMethod === 'naudio'
+                      ? 'border-blue-500 bg-blue-900'
+                      : 'border-gray-600 bg-gray-700 hover:border-gray-500'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="radio"
+                      checked={phaseTestingMethod === 'naudio'}
+                      onChange={() => setPhaseTestingMethod('naudio')}
+                      className="mt-1"
+                    />
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-white mb-2">N-Audio Phase Checker</h3>
+                      <p className="text-gray-300 mb-3">
+                        Professional LED-based phase testing device. Connect pickup coils and read LED color.
+                      </p>
+                      <a
+                        href="https://n-audio.net/guitar-pickup-phase-checker/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-blue-400 hover:text-blue-300 underline text-sm inline-block mb-3"
+                      >
+                        Learn more about N-Audio Phase Checker →
+                      </a>
+                      <div className="text-sm text-gray-400">
+                        Phase indicators: <span className="font-semibold text-white">🟢 Green (Positive Phase)</span> or <span className="font-semibold text-white">🔴 Red (Negative Phase)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Next Button */}
+                <div className="flex justify-end pt-4">
+                  <button
+                    onClick={() => setWizardStep(1)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition"
+                  >
+                    Next: Select Pickups →
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Preset Selection */}
+            {wizardStep > 0 && (
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -1438,41 +1634,82 @@ function HumbuckerAnalyzer() {
                   </div>
 
                   {/* Detailed Testing Instructions */}
-                  <div className="bg-gray-700 rounded-lg p-4 border-2 border-yellow-500">
-                    <h3 className="font-bold text-yellow-400 mb-3 flex items-center gap-2">
-                      <span className="text-xl">⚡</span> Analog Meter Phase Testing Instructions
-                    </h3>
-                    <div className="space-y-3 text-sm text-gray-200">
-                      <div className="font-semibold text-yellow-300">Test Each Coil Individually:</div>
-                      
-                      <div>
-                        <div className="font-semibold text-white mb-1">North Coil Test:</div>
-                        <div className="ml-4 space-y-1">
-                          <div>1. <span className="text-red-400 font-semibold">RED lead (+)</span> → Connect to North Start wire</div>
-                          <div>2. <span className="bg-gray-800 px-1 rounded font-semibold">BLACK lead (−)</span> → Connect to North Finish wire</div>
-                          <div>3. Place screwdriver flat on North coil pole pieces</div>
-                          <div>4. <span className="text-yellow-300 font-semibold">Rapidly pull screwdriver off</span> the poles</div>
-                          <div>5. Watch analog meter needle as you pull off</div>
+                  {(() => {
+                    const instructions = getPhaseInstructions(phaseTestingMethod);
+                    return (
+                      <div className="bg-gray-700 rounded-lg p-4 border-2 border-yellow-500">
+                        <h3 className="font-bold text-yellow-400 mb-3 flex items-center gap-2">
+                          <span className="text-xl">⚡</span> {instructions.title}
+                        </h3>
+                        <div className="space-y-3 text-sm text-gray-200">
+                          {/* Device Setup Info */}
+                          <div className="bg-gray-600 rounded p-2">
+                            {instructions.deviceSetup.map((line, idx) => (
+                              <div key={idx} className="text-gray-300">
+                                {idx === 1 && instructions.deviceLink ? (
+                                  <a href={instructions.deviceLink} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline">
+                                    {line}
+                                  </a>
+                                ) : line}
+                              </div>
+                            ))}
+                          </div>
+
+                          <div className="font-semibold text-yellow-300">Test Each Coil Individually:</div>
+
+                          {/* North Coil Test */}
+                          <div>
+                            <div className="font-semibold text-white mb-1">North Coil Test:</div>
+                            <div className="ml-4 space-y-1">
+                              {instructions.testSteps.map((step, idx) => (
+                                <div key={idx}>
+                                  {idx + 1}. {step.highlight === 'red' ? (
+                                    <><span className="text-red-400 font-semibold">RED lead (+)</span> → Connect to North Start wire</>
+                                  ) : step.highlight === 'black' ? (
+                                    <><span className="bg-gray-800 px-1 rounded font-semibold">BLACK lead (−)</span> → Connect to North Finish wire</>
+                                  ) : step.highlight === 'yellow' ? (
+                                    <><span className="text-yellow-300 font-semibold">Rapidly pull screwdriver off</span> the poles</>
+                                  ) : step.text.replace('coil', 'North coil')}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* South Coil Test */}
+                          <div>
+                            <div className="font-semibold text-white mb-1">South Coil Test:</div>
+                            <div className="ml-4 space-y-1">
+                              {instructions.testSteps.map((step, idx) => (
+                                <div key={idx}>
+                                  {idx + 1}. {step.highlight === 'red' ? (
+                                    <><span className="text-red-400 font-semibold">RED lead (+)</span> → Connect to South Start wire</>
+                                  ) : step.highlight === 'black' ? (
+                                    <><span className="bg-gray-800 px-1 rounded font-semibold">BLACK lead (−)</span> → Connect to South Finish wire</>
+                                  ) : step.highlight === 'yellow' ? (
+                                    <><span className="text-yellow-300 font-semibold">Rapidly pull screwdriver off</span> the poles</>
+                                  ) : step.text.replace('coil', 'South coil')}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Question */}
+                          <div className="bg-gray-600 rounded p-2 mt-2">
+                            <div className="font-semibold text-yellow-300">{instructions.question}</div>
+                          </div>
+
+                          {/* Visual Guide */}
+                          <div className="bg-blue-900 rounded p-3 mt-2">
+                            <div className="font-semibold text-blue-300 mb-2">Visual Guide:</div>
+                            <div className="text-gray-300 mb-2">{instructions.visualNote}</div>
+                            {instructions.visualMappings.map((mapping, idx) => (
+                              <div key={idx} className="text-sm text-gray-300 ml-2">• {mapping}</div>
+                            ))}
+                          </div>
                         </div>
                       </div>
-                      
-                      <div>
-                        <div className="font-semibold text-white mb-1">South Coil Test:</div>
-                        <div className="ml-4 space-y-1">
-                          <div>1. <span className="text-red-400 font-semibold">RED lead (+)</span> → Connect to South Start wire</div>
-                          <div>2. <span className="bg-gray-800 px-1 rounded font-semibold">BLACK lead (−)</span> → Connect to South Finish wire</div>
-                          <div>3. Place screwdriver flat on South coil pole pieces</div>
-                          <div>4. <span className="text-yellow-300 font-semibold">Rapidly pull screwdriver off</span> the poles</div>
-                          <div>5. Watch analog meter needle as you pull off</div>
-                        </div>
-                      </div>
-                      
-                      <div className="bg-gray-600 rounded p-2 mt-2">
-                        <div className="font-semibold text-yellow-300">Which direction did the needle move when pulling off?</div>
-                        <div className="ml-4 mt-1">← <span className="text-white">Left</span> or <span className="text-white">Right</span> →</div>
-                      </div>
-                    </div>
-                  </div>
+                    );
+                  })()}
                   
                   {/* North Coil */}
                   <div className="space-y-2">
@@ -1546,37 +1783,32 @@ function HumbuckerAnalyzer() {
                     </div>
                     
                     {/* North Coil Phase */}
-                    <div className="mt-2">
-                      <div className="text-xs text-gray-300 mb-1">North Coil Phase Test:</div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <button
-                          onClick={() => setWizardData({
-                            ...wizardData,
-                            [`pickup${wizardStep}`]: { ...wizardData[`pickup${wizardStep}`], northPhase: '← Left' }
-                          })}
-                          className={`p-2 rounded border-2 text-sm font-semibold ${
-                            wizardData[`pickup${wizardStep}`].northPhase === '← Left'
-                              ? 'border-blue-500 bg-blue-900 text-white'
-                              : 'border-gray-600 bg-gray-800 text-gray-300'
-                          }`}
-                        >
-                          ← Left
-                        </button>
-                        <button
-                          onClick={() => setWizardData({
-                            ...wizardData,
-                            [`pickup${wizardStep}`]: { ...wizardData[`pickup${wizardStep}`], northPhase: '→ Right' }
-                          })}
-                          className={`p-2 rounded border-2 text-sm font-semibold ${
-                            wizardData[`pickup${wizardStep}`].northPhase === '→ Right'
-                              ? 'border-blue-500 bg-blue-900 text-white'
-                              : 'border-gray-600 bg-gray-800 text-gray-300'
-                          }`}
-                        >
-                          → Right
-                        </button>
-                      </div>
-                    </div>
+                    {(() => {
+                      const instructions = getPhaseInstructions(phaseTestingMethod);
+                      return (
+                        <div className="mt-2">
+                          <div className="text-xs text-gray-300 mb-1">North Coil Phase Test:</div>
+                          <div className="grid grid-cols-2 gap-2">
+                            {instructions.phaseOptions.map((option, idx) => (
+                              <button
+                                key={idx}
+                                onClick={() => setWizardData({
+                                  ...wizardData,
+                                  [`pickup${wizardStep}`]: { ...wizardData[`pickup${wizardStep}`], northPhase: option.value }
+                                })}
+                                className={`p-2 rounded border-2 text-sm font-semibold ${
+                                  wizardData[`pickup${wizardStep}`].northPhase === option.value
+                                    ? 'border-blue-500 bg-blue-900 text-white'
+                                    : 'border-gray-600 bg-gray-800 text-gray-300'
+                                }`}
+                              >
+                                {option.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                   
                   {/* South Coil */}
@@ -1651,37 +1883,32 @@ function HumbuckerAnalyzer() {
                     </div>
                     
                     {/* South Coil Phase */}
-                    <div className="mt-2">
-                      <div className="text-xs text-gray-300 mb-1">South Coil Phase Test:</div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <button
-                          onClick={() => setWizardData({
-                            ...wizardData,
-                            [`pickup${wizardStep}`]: { ...wizardData[`pickup${wizardStep}`], southPhase: '← Left' }
-                          })}
-                          className={`p-2 rounded border-2 text-sm font-semibold ${
-                            wizardData[`pickup${wizardStep}`].southPhase === '← Left'
-                              ? 'border-blue-500 bg-blue-900 text-white'
-                              : 'border-gray-600 bg-gray-800 text-gray-300'
-                          }`}
-                        >
-                          ← Left
-                        </button>
-                        <button
-                          onClick={() => setWizardData({
-                            ...wizardData,
-                            [`pickup${wizardStep}`]: { ...wizardData[`pickup${wizardStep}`], southPhase: '→ Right' }
-                          })}
-                          className={`p-2 rounded border-2 text-sm font-semibold ${
-                            wizardData[`pickup${wizardStep}`].southPhase === '→ Right'
-                              ? 'border-blue-500 bg-blue-900 text-white'
-                              : 'border-gray-600 bg-gray-800 text-gray-300'
-                          }`}
-                        >
-                          → Right
-                        </button>
-                      </div>
-                    </div>
+                    {(() => {
+                      const instructions = getPhaseInstructions(phaseTestingMethod);
+                      return (
+                        <div className="mt-2">
+                          <div className="text-xs text-gray-300 mb-1">South Coil Phase Test:</div>
+                          <div className="grid grid-cols-2 gap-2">
+                            {instructions.phaseOptions.map((option, idx) => (
+                              <button
+                                key={idx}
+                                onClick={() => setWizardData({
+                                  ...wizardData,
+                                  [`pickup${wizardStep}`]: { ...wizardData[`pickup${wizardStep}`], southPhase: option.value }
+                                })}
+                                className={`p-2 rounded border-2 text-sm font-semibold ${
+                                  wizardData[`pickup${wizardStep}`].southPhase === option.value
+                                    ? 'border-blue-500 bg-blue-900 text-white'
+                                    : 'border-gray-600 bg-gray-800 text-gray-300'
+                                }`}
+                              >
+                                {option.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
               )}
@@ -1704,19 +1931,34 @@ function HumbuckerAnalyzer() {
                 </div>
               )}
               
-              {/* Analog Meter Testing Instructions - Only for preset pickups */}
+              {/* Phase Testing Instructions - Only for preset pickups */}
               {!wizardData[`pickup${wizardStep}`].isCustom && wizardData[`pickup${wizardStep}`].preset && (() => {
                 const selectedPreset = allPresets.find(p => p.name === wizardData[`pickup${wizardStep}`].preset);
                 if (!selectedPreset || !selectedPreset.manufacturer) return null;
-                
+
+                const instructions = getPhaseInstructions(phaseTestingMethod);
+
                 return (
                   <div className="bg-gray-700 rounded-lg p-4 border-2 border-yellow-500">
                     <h3 className="font-bold text-yellow-400 mb-3 flex items-center gap-2">
-                      <span className="text-xl">⚡</span> Analog Meter Phase Testing Instructions
+                      <span className="text-xl">⚡</span> {instructions.title}
                     </h3>
                     <div className="space-y-3 text-sm text-gray-200">
+                      {/* Device Setup Info */}
+                      <div className="bg-gray-600 rounded p-2">
+                        {instructions.deviceSetup.map((line, idx) => (
+                          <div key={idx} className="text-gray-300">
+                            {idx === 1 && instructions.deviceLink ? (
+                              <a href={instructions.deviceLink} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline">
+                                {line}
+                              </a>
+                            ) : line}
+                          </div>
+                        ))}
+                      </div>
+
                       <div>
-                        <div className="font-semibold text-white mb-1">Step 1: Connect Analog Meter Leads</div>
+                        <div className="font-semibold text-white mb-1">Step 1: Connect Test Leads</div>
                         <div className="ml-4">
                           • <span className="text-red-400">RED lead (+)</span> → <span className="font-bold text-white">{selectedPreset.north.positive} wire</span> (North Start/Ground wire)
                         </div>
@@ -1724,7 +1966,7 @@ function HumbuckerAnalyzer() {
                           • <span className="text-black bg-gray-300 px-1 rounded">BLACK lead (−)</span> → <span className="font-bold text-white">{selectedPreset.south.negative} wire</span> (South Finish/Hot wire)
                         </div>
                       </div>
-                      
+
                       {!wizardData[`pickup${wizardStep}`].isTwoConductor && (
                         <div>
                           <div className="font-semibold text-white mb-1">Step 2: Connect Series Wires</div>
@@ -1736,23 +1978,44 @@ function HumbuckerAnalyzer() {
                           </div>
                         </div>
                       )}
-                      
+
                       <div>
-                        <div className="font-semibold text-white mb-1">Step 3: Test with Metal Object</div>
-                        <div className="ml-4">
-                          • Place a screwdriver (or similar metal object) flat on the pickup pole pieces
-                        </div>
-                        <div className="ml-4">
-                          • <span className="text-yellow-300 font-semibold">Rapidly pull the screwdriver off</span> the poles
-                        </div>
-                        <div className="ml-4">
-                          • Watch the analog meter needle as you pull off
-                        </div>
+                        <div className="font-semibold text-white mb-1">Step 3: Perform Phase Test</div>
+                        {phaseTestingMethod === 'naudio' ? (
+                          <>
+                            <div className="ml-4">
+                              • Power on the N-Audio Phase Checker device
+                            </div>
+                            <div className="ml-4">
+                              • Read the LED indicator color
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="ml-4">
+                              • Place a screwdriver (or similar metal object) flat on the pickup pole pieces
+                            </div>
+                            <div className="ml-4">
+                              • <span className="text-yellow-300 font-semibold">Rapidly pull the screwdriver off</span> the poles
+                            </div>
+                            <div className="ml-4">
+                              • Watch the {phaseTestingMethod === 'analog' ? 'needle direction' : 'voltage reading'}
+                            </div>
+                          </>
+                        )}
                       </div>
-                      
+
                       <div className="bg-gray-600 rounded p-2 mt-2">
-                        <div className="font-semibold text-yellow-300">Which direction did the needle move when pulling off?</div>
-                        <div className="ml-4 mt-1">← <span className="text-white">Left</span> or <span className="text-white">Right</span> →</div>
+                        <div className="font-semibold text-yellow-300">{instructions.question}</div>
+                      </div>
+
+                      {/* Visual Guide */}
+                      <div className="bg-blue-900 rounded p-3 mt-2">
+                        <div className="font-semibold text-blue-300 mb-2">Visual Guide:</div>
+                        <div className="text-gray-300 mb-2">{instructions.visualNote}</div>
+                        {instructions.visualMappings.map((mapping, idx) => (
+                          <div key={idx} className="text-sm text-gray-300 ml-2">• {mapping}</div>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -1760,43 +2023,35 @@ function HumbuckerAnalyzer() {
               })()}
               
               {/* Phase Selection - Only for preset pickups */}
-              {!wizardData[`pickup${wizardStep}`].isCustom && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Analog Meter Phase Test Result
-                  </label>
-                  <div className="grid grid-cols-2 gap-4">
-                    <button
-                      onClick={() => setWizardData({
-                        ...wizardData,
-                        [`pickup${wizardStep}`]: { ...wizardData[`pickup${wizardStep}`], phase: '← Left' }
-                      })}
-                      className={`p-4 rounded-lg border-2 transition ${
-                        wizardData[`pickup${wizardStep}`].phase === '← Left'
-                          ? 'border-blue-500 bg-blue-900 text-white'
-                          : 'border-gray-600 bg-gray-700 text-gray-300 hover:border-gray-500'
-                      }`}
-                    >
-                      <div className="text-2xl mb-2">←</div>
-                      <div className="font-semibold">Left</div>
-                    </button>
-                    <button
-                      onClick={() => setWizardData({
-                        ...wizardData,
-                        [`pickup${wizardStep}`]: { ...wizardData[`pickup${wizardStep}`], phase: '→ Right' }
-                      })}
-                      className={`p-4 rounded-lg border-2 transition ${
-                        wizardData[`pickup${wizardStep}`].phase === '→ Right'
-                          ? 'border-blue-500 bg-blue-900 text-white'
-                          : 'border-gray-600 bg-gray-700 text-gray-300 hover:border-gray-500'
-                      }`}
-                    >
-                      <div className="text-2xl mb-2">→</div>
-                      <div className="font-semibold">Right</div>
-                    </button>
+              {!wizardData[`pickup${wizardStep}`].isCustom && (() => {
+                const instructions = getPhaseInstructions(phaseTestingMethod);
+                return (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Phase Test Result
+                    </label>
+                    <div className="grid grid-cols-2 gap-4">
+                      {instructions.phaseOptions.map((option, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => setWizardData({
+                            ...wizardData,
+                            [`pickup${wizardStep}`]: { ...wizardData[`pickup${wizardStep}`], phase: option.value }
+                          })}
+                          className={`p-4 rounded-lg border-2 transition ${
+                            wizardData[`pickup${wizardStep}`].phase === option.value
+                              ? 'border-blue-500 bg-blue-900 text-white'
+                              : 'border-gray-600 bg-gray-700 text-gray-300 hover:border-gray-500'
+                          }`}
+                        >
+                          <div className="text-2xl mb-2">{option.label.split(' ')[0]}</div>
+                          <div className="font-semibold">{option.display}</div>
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
             </div>
             
             {/* Navigation Buttons */}
@@ -1867,6 +2122,7 @@ function HumbuckerAnalyzer() {
                 </button>
               )}
             </div>
+            )}
           </div>
         </div>
       )}
