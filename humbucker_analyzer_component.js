@@ -2398,7 +2398,17 @@ function HumbuckerAnalyzer() {
         {/* Summary Section - Below Visual Comparison */}
         {pickups.length === 2 && pickups[0].manufacturer && pickups[1].manufacturer && !showSetupWizard && (
           <div className="bg-gray-800 rounded-lg p-6 mb-8 print:border print:border-gray-300 print:bg-white">
-            <h2 className="text-2xl font-bold text-blue-400 mb-6 print:text-black">Pickup Summary</h2>
+            <div className="flex items-center justify-between mb-6 print:block">
+              <h2 className="text-2xl font-bold text-blue-400 print:text-black">Pickup Summary</h2>
+              <button
+                onClick={handlePrint}
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition print:hidden"
+                title="Print pickup details and wiring diagrams"
+              >
+                <Printer size={20} />
+                Print
+              </button>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {pickups.map((pickup, idx) => (
                 <div key={pickup.id} className="bg-gray-700 rounded-lg p-6 print:border print:border-gray-300 print:bg-white">
