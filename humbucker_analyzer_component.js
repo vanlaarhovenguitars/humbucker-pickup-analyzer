@@ -2053,7 +2053,8 @@ function HumbuckerAnalyzer() {
                 );
               })()}
             </div>
-            
+            )}
+
             {/* Navigation Buttons */}
             <div className="flex gap-4 mt-8">
               {wizardStep === 2 && (
