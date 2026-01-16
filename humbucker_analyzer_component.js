@@ -2055,7 +2055,8 @@ function HumbuckerAnalyzer() {
             </div>
             )}
 
-            {/* Navigation Buttons */}
+            {/* Navigation Buttons - Only show for pickup selection steps */}
+            {wizardStep > 0 && (
             <div className="flex gap-4 mt-8">
               {wizardStep === 2 && (
                 <button
