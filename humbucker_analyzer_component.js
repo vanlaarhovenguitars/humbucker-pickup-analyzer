@@ -81,6 +81,11 @@ function HumbuckerAnalyzer() {
   const [showSessionModal, setShowSessionModal] = useState(false);
   const [showLoadModal, setShowLoadModal] = useState(false);
 
+  // Google Sheets integration
+  const [googleSheetsPresets, setGoogleSheetsPresets] = useState([]);
+  const [presetsLoading, setPresetsLoading] = useState(false);
+  const [presetsLoadError, setPresetsLoadError] = useState(null);
+
   // Common wire color options
   const colorOptions = [
     '',
@@ -159,6 +164,64 @@ function HumbuckerAnalyzer() {
     { name: 'Suhr', manufacturer: 'Suhr', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
     { name: 'Tone Rider', manufacturer: 'Tone Rider', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } }
   ];
+
+  // Merged preset database (hardcoded + Google Sheets)
+  const allPresets = React.useMemo(() => {
+    // Start with default entries
+    const merged = [
+      { name: '-- Select a Preset --', manufacturer: '', north: { positive: '', negative: '', poleType: '' }, south: { positive: '', negative: '', poleType: '' } },
+      { name: 'Custom/Unknown Pickup', manufacturer: 'Custom', north: { positive: '', negative: '', poleType: '' }, south: { positive: '', negative: '', poleType: '' } }
+    ];
+
+    // Add hardcoded presets (skip first two which are Select and Custom)
+    merged.push(...presetDatabase.slice(2));
+
+    // Add Google Sheets presets if available
+    if (googleSheetsPresets.length > 0) {
+      merged.push(...googleSheetsPresets);
+    }
+
+    return merged;
+  }, [googleSheetsPresets]);
+
+  // Load presets from Google Sheets on component mount
+  React.useEffect(() => {
+    const loadPresets = async () => {
+      // Check if Google Sheets integration is enabled
+      if (!CONFIG?.ENABLE_GOOGLE_SHEETS) {
+        return;
+      }
+
+      setPresetsLoading(true);
+      setPresetsLoadError(null);
+
+      try {
+        const presets = [];
+
+        // Load curated database
+        if (CONFIG.CURATED_DATABASE_URL) {
+          const curatedPresets = await loadPresetsFromCSV(CONFIG.CURATED_DATABASE_URL, false);
+          presets.push(...curatedPresets);
+        }
+
+        // Load user submissions if enabled
+        if (CONFIG.ENABLE_USER_SUBMISSIONS && CONFIG.USER_SUBMISSIONS_URL) {
+          const userPresets = await loadPresetsFromCSV(CONFIG.USER_SUBMISSIONS_URL, true);
+          presets.push(...userPresets);
+        }
+
+        setGoogleSheetsPresets(presets);
+        console.log(`Loaded ${presets.length} presets from Google Sheets`);
+      } catch (error) {
+        console.error('Error loading Google Sheets presets:', error);
+        setPresetsLoadError(error.message);
+      } finally {
+        setPresetsLoading(false);
+      }
+    };
+
+    loadPresets();
+  }, []); // Run only once on mount
 
   const wireColors = [
     { name: 'Black', hex: '#000000', needsBorder: true },
@@ -839,7 +902,7 @@ function HumbuckerAnalyzer() {
   );
 
   const applyPreset = (pickupIndex, presetName) => {
-    const preset = presetDatabase.find(p => p.name === presetName);
+    const preset = allPresets.find(p => p.name === presetName);
     if (!preset || !preset.manufacturer) return; // Skip if "Select a Preset" option
     
     // Show phase check modal
@@ -990,7 +1053,7 @@ function HumbuckerAnalyzer() {
         };
       } else {
         // Preset pickup
-        const preset = presetDatabase.find(p => p.name === pickupData.preset);
+        const preset = allPresets.find(p => p.name === pickupData.preset);
         if (!preset || !preset.manufacturer) return null;
         
         return {
@@ -1046,6 +1109,39 @@ function HumbuckerAnalyzer() {
         }, 100);
       }
     }
+  };
+
+  const shareCustomPickupWithCommunity = (pickupStep) => {
+    // Get the custom pickup data from the wizard
+    const pickupData = wizardData[`pickup${pickupStep}`];
+
+    if (!pickupData.isCustom) {
+      alert('Only custom pickups can be shared with the community.');
+      return;
+    }
+
+    // Check if form template is configured
+    if (!CONFIG?.GOOGLE_FORM_TEMPLATE_URL || !CONFIG?.ENABLE_SHARE_BUTTON) {
+      alert('Community sharing is not yet configured. Please check back later!');
+      return;
+    }
+
+    // Prepare data for the form
+    const formData = {
+      northRed: pickupData.customColors.northPositive,
+      northBlack: pickupData.customColors.northNegative,
+      northPole: pickupData.northPoleType,
+      southRed: pickupData.customColors.southPositive,
+      southBlack: pickupData.customColors.southNegative,
+      southPole: pickupData.southPoleType,
+      notes: `North Phase: ${pickupData.northPhase}, South Phase: ${pickupData.southPhase}`
+    };
+
+    // Generate pre-filled form URL
+    const formURL = generatePrefilledFormURL(CONFIG.GOOGLE_FORM_TEMPLATE_URL, formData);
+
+    // Open form in new tab
+    window.open(formURL, '_blank');
   };
 
   const checkPhaseConflict = (currentPickupIndex, currentPhase, updatedPickups, currentIs2Conductor) => {
@@ -1284,7 +1380,7 @@ function HumbuckerAnalyzer() {
                   }}
                   className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  {presetDatabase.map((preset, idx) => (
+                  {allPresets.map((preset, idx) => (
                     <option key={idx} value={preset.name}>{preset.name}</option>
                   ))}
                 </select>
@@ -1564,7 +1660,7 @@ function HumbuckerAnalyzer() {
               
               {/* Multimeter Testing Instructions - Only for preset pickups */}
               {!wizardData[`pickup${wizardStep}`].isCustom && wizardData[`pickup${wizardStep}`].preset && (() => {
-                const selectedPreset = presetDatabase.find(p => p.name === wizardData[`pickup${wizardStep}`].preset);
+                const selectedPreset = allPresets.find(p => p.name === wizardData[`pickup${wizardStep}`].preset);
                 if (!selectedPreset || !selectedPreset.manufacturer) return null;
                 
                 return (
@@ -1703,6 +1799,22 @@ function HumbuckerAnalyzer() {
               >
                 {wizardStep === 1 ? 'Next →' : 'Complete Setup'}
               </button>
+
+              {/* Share with Community button - only show for custom pickups */}
+              {CONFIG?.ENABLE_SHARE_BUTTON && wizardData[`pickup${wizardStep}`]?.isCustom && (
+                <button
+                  onClick={() => shareCustomPickupWithCommunity(wizardStep)}
+                  disabled={(() => {
+                    const currentData = wizardData[`pickup${wizardStep}`];
+                    return !currentData.northPhase || !currentData.southPhase;
+                  })()}
+                  className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2"
+                  title="Share this custom pickup with the community database"
+                >
+                  <Upload size={20} />
+                  Share with Community
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -2130,7 +2242,7 @@ function HumbuckerAnalyzer() {
                     className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 print:bg-white print:text-black print:border-gray-400"
                     defaultValue=""
                   >
-                    {presetDatabase.map((preset, idx) => (
+                    {allPresets.map((preset, idx) => (
                       <option key={idx} value={preset.name}>{preset.name}</option>
                     ))}
                   </select>
