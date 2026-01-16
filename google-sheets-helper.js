@@ -111,36 +111,72 @@ async function loadPresetsFromCSV(url, isUserSubmissions = false) {
  * @param {string} templateUrl - Google Form pre-filled template URL
  * @param {Object} pickupData - Pickup data to pre-fill
  * @returns {string} Pre-filled form URL
+ *
+ * Template URL should be created by:
+ * 1. Text fields: Use placeholders USERNAME, MANUFACTURER, MODEL, NOTES
+ * 2. Dropdowns (colors): Select "Black" for ALL wire color fields
+ * 3. Multiple choice (poles): Select "Slug" for ALL pole type fields
+ *
+ * This function will replace them in the correct order with actual values
  */
 function generatePrefilledFormURL(templateUrl, pickupData) {
   if (!templateUrl) return '';
 
-  // Google Forms uses entry IDs in the URL
-  // The template URL should look like:
-  // https://docs.google.com/forms/d/e/FORM_ID/viewform?usp=pp_url&entry.123=USERNAME&entry.456=MANUFACTURER...
+  // Parse URL to get parameters
+  const url = new URL(templateUrl);
+  const params = new URLSearchParams(url.search);
 
-  // We'll do simple string replacement for the placeholders
-  let url = templateUrl;
+  // Track which "Black" and "Slug" we're replacing (in order)
+  let blackIndex = 0;
+  let slugIndex = 0;
 
-  const replacements = {
-    'USERNAME': pickupData.username || '',
-    'MANUFACTURER': pickupData.manufacturer || '',
-    'MODEL': pickupData.model || '',
-    'NORTH_RED': pickupData.northRed || '',
-    'NORTH_BLACK': pickupData.northBlack || '',
-    'NORTH_POLE': pickupData.northPole || '',
-    'SOUTH_RED': pickupData.southRed || '',
-    'SOUTH_BLACK': pickupData.southBlack || '',
-    'SOUTH_POLE': pickupData.southPole || '',
-    'NOTES': pickupData.notes || ''
-  };
+  // Order of Black replacements: North RED, North BLACK, South RED, South BLACK
+  const blackReplacements = [
+    pickupData.northRed,
+    pickupData.northBlack,
+    pickupData.southRed,
+    pickupData.southBlack
+  ];
 
-  // Replace each placeholder
-  Object.keys(replacements).forEach(key => {
-    url = url.replace(key, encodeURIComponent(replacements[key]));
-  });
+  // Order of Slug replacements: North Pole, South Pole
+  const slugReplacements = [
+    pickupData.northPole,
+    pickupData.southPole
+  ];
 
-  return url;
+  // Replace parameters
+  const newParams = new URLSearchParams();
+
+  for (const [key, value] of params.entries()) {
+    let newValue = value;
+
+    // Replace text placeholders
+    if (value === 'USERNAME') {
+      newValue = pickupData.username || '';
+    } else if (value === 'MANUFACTURER') {
+      newValue = pickupData.manufacturer || '';
+    } else if (value === 'MODEL') {
+      newValue = pickupData.model || '';
+    } else if (value === 'NOTES') {
+      newValue = pickupData.notes || '';
+    }
+    // Replace dropdown values (Black = wire colors)
+    else if (value === 'Black' && blackIndex < blackReplacements.length) {
+      newValue = blackReplacements[blackIndex] || 'Black';
+      blackIndex++;
+    }
+    // Replace multiple choice values (Slug = pole types)
+    else if (value === 'Slug' && slugIndex < slugReplacements.length) {
+      newValue = slugReplacements[slugIndex] || 'Slug';
+      slugIndex++;
+    }
+
+    newParams.append(key, newValue);
+  }
+
+  // Rebuild URL
+  url.search = newParams.toString();
+  return url.toString();
 }
 
 // Export for use in component

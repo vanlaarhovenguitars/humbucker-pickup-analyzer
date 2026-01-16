@@ -72,20 +72,29 @@
 
 1. Click the **three dots menu** (⋮) in the top right
 2. Select **"Get pre-filled link"**
-3. Fill out the form with **placeholder values**:
+3. Fill out the form with **these EXACT values**:
+
+   **Text fields (use placeholders):**
    - Username: `USERNAME`
    - Manufacturer: `MANUFACTURER`
    - Model: `MODEL`
-   - North RED: Select any (e.g., Black)
-   - North BLACK: Select any
-   - North Pole: Select any
-   - South RED: Select any
-   - South BLACK: Select any
-   - South Pole: Select any
    - Notes: `NOTES`
+
+   **Dropdown fields (use "Black" for ALL wire colors):**
+   - North Coil: RED lead (+): Select **Black**
+   - North Coil: BLACK lead (−): Select **Black**
+   - South Coil: RED lead (+): Select **Black**
+   - South Coil: BLACK lead (−): Select **Black**
+
+   **Multiple choice (use "Slug" for ALL pole types):**
+   - North Coil Pole Type: Select **Slug**
+   - South Coil Pole Type: Select **Slug**
+
 4. Click **"Get link"** at the bottom
 5. Click **"Copy link"**
 6. **Save this URL** - you'll need to give it to me
+
+**Why Black and Slug?** The app will automatically replace these values in order with the actual wire colors and pole types from the custom pickup. This is how Google Forms dropdowns work with pre-filled links.
 
 The URL will look like:
 ```
