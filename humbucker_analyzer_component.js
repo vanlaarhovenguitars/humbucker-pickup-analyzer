@@ -187,6 +187,13 @@ function HumbuckerAnalyzer() {
     return instructions[method] || instructions.analog;
   };
 
+  // Get display-friendly phase label based on testing method
+  const getPhaseDisplay = (phaseValue) => {
+    const instructions = getPhaseInstructions(phaseTestingMethod);
+    const option = instructions.phaseOptions.find(opt => opt.value === phaseValue);
+    return option ? option.display : phaseValue;
+  };
+
   // Preset database based on official pickup color code charts
   // IMPORTANT: North start (positive/left) = HOT output, South start (positive/left) = GROUND
   // Series connection: North finish (negative/right) connects to South finish (negative/right)
@@ -2414,7 +2421,7 @@ function HumbuckerAnalyzer() {
                     
                     <div>
                       <span className="text-gray-400 print:text-gray-700">Phase:</span>
-                      <span className="text-white ml-2 font-semibold print:text-black">{pickup.coils.north.phase}</span>
+                      <span className="text-white ml-2 font-semibold print:text-black">{getPhaseDisplay(pickup.coils.north.phase)}</span>
                     </div>
                     
                     <div className="border-t border-gray-700 pt-3 mt-3 print:border-gray-300">
