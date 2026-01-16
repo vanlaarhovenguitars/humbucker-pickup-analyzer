@@ -4,7 +4,9 @@ This folder contains an editable spreadsheet of all humbucker pickup wire color 
 
 ## Files
 
-- **`pickup_database.csv`** - The main database (editable in Excel, Google Sheets, or any text editor)
+- **`pickup_database_detailed.csv`** - The main detailed database (plain CSV)
+- **`pickup_database_formatted.xlsx`** - Beautifully formatted Excel file with color coding
+- **`generate_formatted_database.py`** - Script to create formatted Excel from CSV
 - **`validate_pickup_database.py`** - Validation script to check for errors
 - **`pickup_presets_generated.js`** - Auto-generated JavaScript (created by validation script)
 
@@ -12,32 +14,51 @@ This folder contains an editable spreadsheet of all humbucker pickup wire color 
 
 ### Step 1: Download and Edit
 
-1. Download `pickup_database.csv`
-2. Open in Excel, Google Sheets, LibreOffice, or any CSV editor
-3. Make your changes:
-   - Fix incorrect wire colors
-   - Add new pickup manufacturers
-   - Update pole types (Slug/Screw)
-   - Add notes
+**Option A: Use the Formatted Excel File (Recommended)**
+1. Download `pickup_database_formatted.xlsx`
+2. Open in Excel or LibreOffice
+3. You'll see:
+   - 🎨 **Color-coded wire colors** (Black cells with white text, Red cells with red background, etc.)
+   - 🔵 **STANDARD Ground/Hot** columns with blue background
+   - 🟡 **PHASE REVERSED Ground/Hot** columns with yellow background
+   - 🟢 **Ground wires** in green text
+   - 🔴 **Hot wires** in red text
+   - **Thick borders** around important columns
+
+**Option B: Use the Plain CSV (For mass editing)**
+1. Download `pickup_database_detailed.csv`
+2. Open in Excel, Google Sheets, LibreOffice, or any text editor
+3. No colors, but easier for bulk find/replace
+
+**Make your changes:**
+- Fix incorrect wire colors
+- Add new pickup manufacturers
+- Update pole types (Slug/Screw)
+- Add notes
 
 ### Step 2: Understand the Columns
 
-| Column | Description | Example |
+The database now shows **multimeter testing perspective** - which wire connects to which multimeter lead:
+
+| Column | Description | Example (Seymour Duncan) |
 |--------|-------------|---------|
 | **Preset Name** | Pickup model/name | `Seymour Duncan` |
 | **Manufacturer** | Company name | `Seymour Duncan` |
-| **North Coil Positive (Start)** | North coil start wire (ground side) | `Green` |
-| **North Coil Negative (Finish)** | North coil finish wire (series side) | `Red` |
+| **North Coil: RED lead (+)** | Wire that connects to RED (+) multimeter lead on north coil | `Green` ← This is ground |
+| **North Coil: BLACK lead (−)** | Wire that connects to BLACK (−) multimeter lead on north coil | `Red` ← Series wire |
 | **North Pole Type** | Slug or Screw | `Slug` |
-| **South Coil Positive (Start)** | South coil start wire (series side) | `White` |
-| **South Coil Negative (Finish)** | South coil finish wire (hot side) | `Black` |
+| **South Coil: RED lead (+)** | Wire that connects to RED (+) multimeter lead on south coil | `White` ← Series wire |
+| **South Coil: BLACK lead (−)** | Wire that connects to BLACK (−) multimeter lead on south coil | `Black` ← This is hot |
 | **South Pole Type** | Slug or Screw | `Screw` |
-| **Standard Ground Wire** | Ground wire (= North Positive) | `Green` |
-| **Standard Hot Wire** | Hot wire (= South Negative) | `Black` |
-| **Phase Reversed Ground Wire** | Ground when reversed (= South Negative) | `Black` |
-| **Phase Reversed Hot Wire** | Hot when reversed (= North Positive) | `Green` |
-| **Series Connection Wires** | Which wires join the coils | `Red+White` |
+| **Series Wire 1 (North Finish)** | North coil's series wire (BLACK lead side) | `Red` |
+| **Series Wire 2 (South Start)** | South coil's series wire (RED lead side) | `White` |
+| **STANDARD Ground Wire** | Ground wire in standard wiring (= North RED lead) | `Green` |
+| **STANDARD Hot Wire** | Hot wire in standard wiring (= South BLACK lead) | `Black` |
+| **PHASE REVERSED Ground Wire** | Ground when phase reversed (hot/ground swap) | `Black` ← Was hot |
+| **PHASE REVERSED Hot Wire** | Hot when phase reversed (hot/ground swap) | `Green` ← Was ground |
 | **Notes** | Any additional info | `Standard 4-conductor pattern` |
+
+**Important:** When phase is reversed, the coil polarities and series connections stay the same - ONLY the hot and ground wires swap!
 
 ### Step 3: Wire Color Logic
 
@@ -83,7 +104,17 @@ python3 validate_pickup_database.py generate
 
 This creates `pickup_presets_generated.js` which can be copied into the main app.
 
-### Step 6: Update the App
+### Step 6: Regenerate the Formatted Excel (Optional)
+
+If you edited the plain CSV and want to see it with colors again:
+
+```bash
+python3 generate_formatted_database.py
+```
+
+This recreates `pickup_database_formatted.xlsx` with all the color coding and formatting.
+
+### Step 7: Update the App
 
 Copy the contents of `pickup_presets_generated.js` and replace the `presetDatabase` array in `humbucker_analyzer_component.js` (around line 103).
 
