@@ -39,7 +39,7 @@ function csvRowToPreset(row, addedBy = null) {
   const presetName = row['Preset Name'] || row['name'];
   const manufacturer = row['Manufacturer'] || row['manufacturer'];
 
-  // Try new format first (with multimeter perspective columns)
+  // Try new format first (with analog meter perspective columns)
   const northPositive = row['North Coil: RED lead (+)'] || row['north.positive'];
   const northNegative = row['North Coil: BLACK lead (−)'] || row['north.negative'];
   const northPoleType = row['North Pole Type'] || row['north.poleType'] || 'Slug';

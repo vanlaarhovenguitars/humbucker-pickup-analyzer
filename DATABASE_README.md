@@ -38,17 +38,17 @@ This folder contains an editable spreadsheet of all humbucker pickup wire color 
 
 ### Step 2: Understand the Columns
 
-The database now shows **multimeter testing perspective** - which wire connects to which multimeter lead:
+The database now shows **analog meter testing perspective** - which wire connects to which analog meter lead:
 
 | Column | Description | Example (Seymour Duncan) |
 |--------|-------------|---------|
 | **Preset Name** | Pickup model/name | `Seymour Duncan` |
 | **Manufacturer** | Company name | `Seymour Duncan` |
-| **North Coil: RED lead (+)** | Wire that connects to RED (+) multimeter lead on north coil | `Green` ← This is ground |
-| **North Coil: BLACK lead (−)** | Wire that connects to BLACK (−) multimeter lead on north coil | `Red` ← Series wire |
+| **North Coil: RED lead (+)** | Wire that connects to RED (+) analog meter lead on north coil | `Green` ← This is ground |
+| **North Coil: BLACK lead (−)** | Wire that connects to BLACK (−) analog meter lead on north coil | `Red` ← Series wire |
 | **North Pole Type** | Slug or Screw | `Slug` |
-| **South Coil: RED lead (+)** | Wire that connects to RED (+) multimeter lead on south coil | `White` ← Series wire |
-| **South Coil: BLACK lead (−)** | Wire that connects to BLACK (−) multimeter lead on south coil | `Black` ← This is hot |
+| **South Coil: RED lead (+)** | Wire that connects to RED (+) analog meter lead on south coil | `White` ← Series wire |
+| **South Coil: BLACK lead (−)** | Wire that connects to BLACK (−) analog meter lead on south coil | `Black` ← This is hot |
 | **South Pole Type** | Slug or Screw | `Screw` |
 | **Series Wire 1 (North Finish)** | North coil's series wire (BLACK lead side) | `Red` |
 | **Series Wire 2 (South Start)** | South coil's series wire (RED lead side) | `White` |

@@ -37,11 +37,13 @@ function HumbuckerAnalyzer() {
   const [showSetupWizard, setShowSetupWizard] = useState(true);
   const [wizardStep, setWizardStep] = useState(1); // 1 or 2 for pickup 1 or 2
   const [wizardData, setWizardData] = useState({
-    pickup1: { 
-      preset: '', 
-      isTwoConductor: false, 
+    pickup1: {
+      preset: '',
+      isTwoConductor: false,
       phase: '',
       isCustom: false,
+      customBrand: '',
+      customName: '',
       customColors: {
         northPositive: '',
         northNegative: '',
@@ -53,11 +55,13 @@ function HumbuckerAnalyzer() {
       northPoleType: 'Slug',
       southPoleType: 'Screw'
     },
-    pickup2: { 
-      preset: '', 
-      isTwoConductor: false, 
+    pickup2: {
+      preset: '',
+      isTwoConductor: false,
       phase: '',
       isCustom: false,
+      customBrand: '',
+      customName: '',
       customColors: {
         northPositive: '',
         northNegative: '',
@@ -1128,6 +1132,8 @@ function HumbuckerAnalyzer() {
 
     // Prepare data for the form
     const formData = {
+      manufacturer: pickupData.customBrand || '',
+      model: pickupData.customName || '',
       northRed: pickupData.customColors.northPositive,
       northBlack: pickupData.customColors.northNegative,
       northPole: pickupData.northPoleType,
@@ -1281,7 +1287,7 @@ function HumbuckerAnalyzer() {
                   )}
                   
                   <p className="text-xs text-gray-300 mb-1">
-                    <strong>{phaseCheckData.isTwoConductor ? 'Multimeter Connection:' : 'Step 2: Test Phase'}</strong>
+                    <strong>{phaseCheckData.isTwoConductor ? 'Analog Meter Connection:' : 'Step 2: Test Phase'}</strong>
                   </p>
                   <p className="text-xs text-gray-300">
                     <strong className="text-red-400">Red (+) Lead:</strong> Connect to{' '}
@@ -1316,7 +1322,7 @@ function HumbuckerAnalyzer() {
               )}
 
               <div>
-                <label className="block text-sm font-semibold text-gray-300 mb-2">Phase Direction (Multimeter Needle):</label>
+                <label className="block text-sm font-semibold text-gray-300 mb-2">Phase Direction (Analog Meter Needle):</label>
                 <select
                   value={phaseCheckData.phaseDirection}
                   onChange={(e) => setPhaseCheckData({ ...phaseCheckData, phaseDirection: e.target.value })}
@@ -1390,11 +1396,51 @@ function HumbuckerAnalyzer() {
               {wizardData[`pickup${wizardStep}`].isCustom && (
                 <div className="bg-gray-700 rounded-lg p-4 space-y-4">
                   <h3 className="font-bold text-yellow-400">Manual Wire Color Input</h3>
-                  
+
+                  {/* Brand and Name Input Fields */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Pickup Brand/Manufacturer (optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={wizardData[`pickup${wizardStep}`].customBrand}
+                        onChange={(e) => setWizardData({
+                          ...wizardData,
+                          [`pickup${wizardStep}`]: {
+                            ...wizardData[`pickup${wizardStep}`],
+                            customBrand: e.target.value
+                          }
+                        })}
+                        placeholder="e.g., Custom Shop, DIY, etc."
+                        className="w-full bg-gray-600 text-white border border-gray-500 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Pickup Name/Model (optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={wizardData[`pickup${wizardStep}`].customName}
+                        onChange={(e) => setWizardData({
+                          ...wizardData,
+                          [`pickup${wizardStep}`]: {
+                            ...wizardData[`pickup${wizardStep}`],
+                            customName: e.target.value
+                          }
+                        })}
+                        placeholder="e.g., Hot Bridge, Custom Neck, etc."
+                        className="w-full bg-gray-600 text-white border border-gray-500 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+
                   {/* Detailed Testing Instructions */}
                   <div className="bg-gray-700 rounded-lg p-4 border-2 border-yellow-500">
                     <h3 className="font-bold text-yellow-400 mb-3 flex items-center gap-2">
-                      <span className="text-xl">⚡</span> Multimeter Phase Testing Instructions
+                      <span className="text-xl">⚡</span> Analog Meter Phase Testing Instructions
                     </h3>
                     <div className="space-y-3 text-sm text-gray-200">
                       <div className="font-semibold text-yellow-300">Test Each Coil Individually:</div>
@@ -1406,7 +1452,7 @@ function HumbuckerAnalyzer() {
                           <div>2. <span className="bg-gray-800 px-1 rounded font-semibold">BLACK lead (−)</span> → Connect to North Finish wire</div>
                           <div>3. Place screwdriver flat on North coil pole pieces</div>
                           <div>4. <span className="text-yellow-300 font-semibold">Rapidly pull screwdriver off</span> the poles</div>
-                          <div>5. Watch multimeter needle as you pull off</div>
+                          <div>5. Watch analog meter needle as you pull off</div>
                         </div>
                       </div>
                       
@@ -1417,7 +1463,7 @@ function HumbuckerAnalyzer() {
                           <div>2. <span className="bg-gray-800 px-1 rounded font-semibold">BLACK lead (−)</span> → Connect to South Finish wire</div>
                           <div>3. Place screwdriver flat on South coil pole pieces</div>
                           <div>4. <span className="text-yellow-300 font-semibold">Rapidly pull screwdriver off</span> the poles</div>
-                          <div>5. Watch multimeter needle as you pull off</div>
+                          <div>5. Watch analog meter needle as you pull off</div>
                         </div>
                       </div>
                       
@@ -1658,7 +1704,7 @@ function HumbuckerAnalyzer() {
                 </div>
               )}
               
-              {/* Multimeter Testing Instructions - Only for preset pickups */}
+              {/* Analog Meter Testing Instructions - Only for preset pickups */}
               {!wizardData[`pickup${wizardStep}`].isCustom && wizardData[`pickup${wizardStep}`].preset && (() => {
                 const selectedPreset = allPresets.find(p => p.name === wizardData[`pickup${wizardStep}`].preset);
                 if (!selectedPreset || !selectedPreset.manufacturer) return null;
@@ -1666,11 +1712,11 @@ function HumbuckerAnalyzer() {
                 return (
                   <div className="bg-gray-700 rounded-lg p-4 border-2 border-yellow-500">
                     <h3 className="font-bold text-yellow-400 mb-3 flex items-center gap-2">
-                      <span className="text-xl">⚡</span> Multimeter Phase Testing Instructions
+                      <span className="text-xl">⚡</span> Analog Meter Phase Testing Instructions
                     </h3>
                     <div className="space-y-3 text-sm text-gray-200">
                       <div>
-                        <div className="font-semibold text-white mb-1">Step 1: Connect Multimeter Leads</div>
+                        <div className="font-semibold text-white mb-1">Step 1: Connect Analog Meter Leads</div>
                         <div className="ml-4">
                           • <span className="text-red-400">RED lead (+)</span> → <span className="font-bold text-white">{selectedPreset.north.positive} wire</span> (North Start/Ground wire)
                         </div>
@@ -1700,7 +1746,7 @@ function HumbuckerAnalyzer() {
                           • <span className="text-yellow-300 font-semibold">Rapidly pull the screwdriver off</span> the poles
                         </div>
                         <div className="ml-4">
-                          • Watch the multimeter needle as you pull off
+                          • Watch the analog meter needle as you pull off
                         </div>
                       </div>
                       
@@ -1717,7 +1763,7 @@ function HumbuckerAnalyzer() {
               {!wizardData[`pickup${wizardStep}`].isCustom && (
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Multimeter Phase Test Result
+                    Analog Meter Phase Test Result
                   </label>
                   <div className="grid grid-cols-2 gap-4">
                     <button
@@ -2301,7 +2347,7 @@ function HumbuckerAnalyzer() {
                   />
 
                   <div className="bg-gray-700/50 p-4 rounded print:bg-gray-100">
-                    <h4 className="font-semibold mb-3 text-green-300 print:text-black">Positive (+) Multimeter Terminal</h4>
+                    <h4 className="font-semibold mb-3 text-green-300 print:text-black">Positive (+) Analog Meter Terminal</h4>
                     <ColorSelect 
                       value={pickup.coils.north.positive.color}
                       onChange={(v) => updateCoil(pickupIndex, 'north', 'positive', 'color', v)}
@@ -2310,7 +2356,7 @@ function HumbuckerAnalyzer() {
                   </div>
 
                   <div className="bg-gray-700/50 p-4 rounded print:bg-gray-100">
-                    <h4 className="font-semibold mb-3 text-green-300 print:text-black">Negative (-) Multimeter Terminal</h4>
+                    <h4 className="font-semibold mb-3 text-green-300 print:text-black">Negative (-) Analog Meter Terminal</h4>
                     <ColorSelect 
                       value={pickup.coils.north.negative.color}
                       onChange={(v) => updateCoil(pickupIndex, 'north', 'negative', 'color', v)}
@@ -2344,7 +2390,7 @@ function HumbuckerAnalyzer() {
                   />
 
                   <div className="bg-gray-700/50 p-4 rounded print:bg-gray-100">
-                    <h4 className="font-semibold mb-3 text-purple-300 print:text-black">Positive (+) Multimeter Terminal</h4>
+                    <h4 className="font-semibold mb-3 text-purple-300 print:text-black">Positive (+) Analog Meter Terminal</h4>
                     <ColorSelect 
                       value={pickup.coils.south.positive.color}
                       onChange={(v) => updateCoil(pickupIndex, 'south', 'positive', 'color', v)}
@@ -2353,7 +2399,7 @@ function HumbuckerAnalyzer() {
                   </div>
 
                   <div className="bg-gray-700/50 p-4 rounded print:bg-gray-100">
-                    <h4 className="font-semibold mb-3 text-purple-300 print:text-black">Negative (-) Multimeter Terminal</h4>
+                    <h4 className="font-semibold mb-3 text-purple-300 print:text-black">Negative (-) Analog Meter Terminal</h4>
                     <ColorSelect 
                       value={pickup.coils.south.negative.color}
                       onChange={(v) => updateCoil(pickupIndex, 'south', 'negative', 'color', v)}
@@ -2397,7 +2443,7 @@ function HumbuckerAnalyzer() {
             
             <div className="border-t border-gray-600 pt-4 print:border-gray-300">
               <h3 className="font-semibold text-yellow-300 mb-2 print:text-black">Phase Test (Screwdriver Pull-Off):</h3>
-              <p><strong>Setup:</strong> Connect analog multimeter leads to coil terminals, set to lowest DC voltage range.</p>
+              <p><strong>Setup:</strong> Connect analog analog meter leads to coil terminals, set to lowest DC voltage range.</p>
               <p><strong>Test:</strong> Quickly pull a screwdriver away from the pole pieces while watching the needle.</p>
               <p><strong>← Needle jumps LEFT</strong></p>
               <p><strong>→ Needle jumps RIGHT</strong></p>
