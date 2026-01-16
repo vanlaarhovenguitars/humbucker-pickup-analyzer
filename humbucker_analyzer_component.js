@@ -187,11 +187,54 @@ function HumbuckerAnalyzer() {
     return instructions[method] || instructions.analog;
   };
 
+  // Normalize phase value to "negative" or "positive" for cross-method compatibility
+  const normalizePhase = (phaseValue) => {
+    // All "left/down/red" values are negative phase
+    if (phaseValue && (
+      phaseValue.includes('Left') ||
+      phaseValue.includes('Down') ||
+      phaseValue.includes('Red') ||
+      phaseValue.includes('↓') ||
+      phaseValue.includes('←') ||
+      phaseValue.includes('🔴')
+    )) {
+      return 'negative';
+    }
+    // All "right/up/green" values are positive phase
+    if (phaseValue && (
+      phaseValue.includes('Right') ||
+      phaseValue.includes('Up') ||
+      phaseValue.includes('Green') ||
+      phaseValue.includes('↑') ||
+      phaseValue.includes('→') ||
+      phaseValue.includes('🟢')
+    )) {
+      return 'positive';
+    }
+    return null;
+  };
+
   // Get display-friendly phase label based on testing method
   const getPhaseDisplay = (phaseValue) => {
+    if (!phaseValue) return '';
+
     const instructions = getPhaseInstructions(phaseTestingMethod);
-    const option = instructions.phaseOptions.find(opt => opt.value === phaseValue);
-    return option ? option.display : phaseValue;
+
+    // First try direct match
+    const directMatch = instructions.phaseOptions.find(opt => opt.value === phaseValue);
+    if (directMatch) return directMatch.display;
+
+    // If no direct match, normalize and convert to current method
+    const normalized = normalizePhase(phaseValue);
+    if (normalized === 'negative') {
+      // Return the first option (which is always negative/left/down/red)
+      return instructions.phaseOptions[0].display;
+    } else if (normalized === 'positive') {
+      // Return the second option (which is always positive/right/up/green)
+      return instructions.phaseOptions[1].display;
+    }
+
+    return phaseValue;
   };
 
   // Preset database based on official pickup color code charts
@@ -2409,7 +2452,7 @@ function HumbuckerAnalyzer() {
                 Print
               </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-6">
               {pickups.map((pickup, idx) => (
                 <div key={pickup.id} className="bg-gray-700 rounded-lg p-6 print:border print:border-gray-300 print:bg-white">
                   <h3 className="text-xl font-bold text-blue-300 mb-4 print:text-black">
