@@ -37,11 +37,13 @@ function HumbuckerAnalyzer() {
   const [showSetupWizard, setShowSetupWizard] = useState(true);
   const [wizardStep, setWizardStep] = useState(1); // 1 or 2 for pickup 1 or 2
   const [wizardData, setWizardData] = useState({
-    pickup1: { 
-      preset: '', 
-      isTwoConductor: false, 
+    pickup1: {
+      preset: '',
+      isTwoConductor: false,
       phase: '',
       isCustom: false,
+      customBrand: '',
+      customName: '',
       customColors: {
         northPositive: '',
         northNegative: '',
@@ -53,11 +55,13 @@ function HumbuckerAnalyzer() {
       northPoleType: 'Slug',
       southPoleType: 'Screw'
     },
-    pickup2: { 
-      preset: '', 
-      isTwoConductor: false, 
+    pickup2: {
+      preset: '',
+      isTwoConductor: false,
       phase: '',
       isCustom: false,
+      customBrand: '',
+      customName: '',
       customColors: {
         northPositive: '',
         northNegative: '',
@@ -80,6 +84,11 @@ function HumbuckerAnalyzer() {
   const [currentSessionName, setCurrentSessionName] = useState('');
   const [showSessionModal, setShowSessionModal] = useState(false);
   const [showLoadModal, setShowLoadModal] = useState(false);
+
+  // Google Sheets integration
+  const [googleSheetsPresets, setGoogleSheetsPresets] = useState([]);
+  const [presetsLoading, setPresetsLoading] = useState(false);
+  const [presetsLoadError, setPresetsLoadError] = useState(null);
 
   // Common wire color options
   const colorOptions = [
@@ -159,6 +168,64 @@ function HumbuckerAnalyzer() {
     { name: 'Suhr', manufacturer: 'Suhr', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
     { name: 'Tone Rider', manufacturer: 'Tone Rider', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } }
   ];
+
+  // Merged preset database (hardcoded + Google Sheets)
+  const allPresets = React.useMemo(() => {
+    // Start with default entries
+    const merged = [
+      { name: '-- Select a Preset --', manufacturer: '', north: { positive: '', negative: '', poleType: '' }, south: { positive: '', negative: '', poleType: '' } },
+      { name: 'Custom/Unknown Pickup', manufacturer: 'Custom', north: { positive: '', negative: '', poleType: '' }, south: { positive: '', negative: '', poleType: '' } }
+    ];
+
+    // Add hardcoded presets (skip first two which are Select and Custom)
+    merged.push(...presetDatabase.slice(2));
+
+    // Add Google Sheets presets if available
+    if (googleSheetsPresets.length > 0) {
+      merged.push(...googleSheetsPresets);
+    }
+
+    return merged;
+  }, [googleSheetsPresets]);
+
+  // Load presets from Google Sheets on component mount
+  React.useEffect(() => {
+    const loadPresets = async () => {
+      // Check if Google Sheets integration is enabled
+      if (!CONFIG?.ENABLE_GOOGLE_SHEETS) {
+        return;
+      }
+
+      setPresetsLoading(true);
+      setPresetsLoadError(null);
+
+      try {
+        const presets = [];
+
+        // Load curated database
+        if (CONFIG.CURATED_DATABASE_URL) {
+          const curatedPresets = await loadPresetsFromCSV(CONFIG.CURATED_DATABASE_URL, false);
+          presets.push(...curatedPresets);
+        }
+
+        // Load user submissions if enabled
+        if (CONFIG.ENABLE_USER_SUBMISSIONS && CONFIG.USER_SUBMISSIONS_URL) {
+          const userPresets = await loadPresetsFromCSV(CONFIG.USER_SUBMISSIONS_URL, true);
+          presets.push(...userPresets);
+        }
+
+        setGoogleSheetsPresets(presets);
+        console.log(`Loaded ${presets.length} presets from Google Sheets`);
+      } catch (error) {
+        console.error('Error loading Google Sheets presets:', error);
+        setPresetsLoadError(error.message);
+      } finally {
+        setPresetsLoading(false);
+      }
+    };
+
+    loadPresets();
+  }, []); // Run only once on mount
 
   const wireColors = [
     { name: 'Black', hex: '#000000', needsBorder: true },
@@ -839,7 +906,7 @@ function HumbuckerAnalyzer() {
   );
 
   const applyPreset = (pickupIndex, presetName) => {
-    const preset = presetDatabase.find(p => p.name === presetName);
+    const preset = allPresets.find(p => p.name === presetName);
     if (!preset || !preset.manufacturer) return; // Skip if "Select a Preset" option
     
     // Show phase check modal
@@ -990,7 +1057,7 @@ function HumbuckerAnalyzer() {
         };
       } else {
         // Preset pickup
-        const preset = presetDatabase.find(p => p.name === pickupData.preset);
+        const preset = allPresets.find(p => p.name === pickupData.preset);
         if (!preset || !preset.manufacturer) return null;
         
         return {
@@ -1046,6 +1113,41 @@ function HumbuckerAnalyzer() {
         }, 100);
       }
     }
+  };
+
+  const shareCustomPickupWithCommunity = (pickupStep) => {
+    // Get the custom pickup data from the wizard
+    const pickupData = wizardData[`pickup${pickupStep}`];
+
+    if (!pickupData.isCustom) {
+      alert('Only custom pickups can be shared with the community.');
+      return;
+    }
+
+    // Check if form template is configured
+    if (!CONFIG?.GOOGLE_FORM_TEMPLATE_URL || !CONFIG?.ENABLE_SHARE_BUTTON) {
+      alert('Community sharing is not yet configured. Please check back later!');
+      return;
+    }
+
+    // Prepare data for the form
+    const formData = {
+      manufacturer: pickupData.customBrand || '',
+      model: pickupData.customName || '',
+      northRed: pickupData.customColors.northPositive,
+      northBlack: pickupData.customColors.northNegative,
+      northPole: pickupData.northPoleType,
+      southRed: pickupData.customColors.southPositive,
+      southBlack: pickupData.customColors.southNegative,
+      southPole: pickupData.southPoleType,
+      notes: `North Phase: ${pickupData.northPhase}, South Phase: ${pickupData.southPhase}`
+    };
+
+    // Generate pre-filled form URL
+    const formURL = generatePrefilledFormURL(CONFIG.GOOGLE_FORM_TEMPLATE_URL, formData);
+
+    // Open form in new tab
+    window.open(formURL, '_blank');
   };
 
   const checkPhaseConflict = (currentPickupIndex, currentPhase, updatedPickups, currentIs2Conductor) => {
@@ -1185,7 +1287,7 @@ function HumbuckerAnalyzer() {
                   )}
                   
                   <p className="text-xs text-gray-300 mb-1">
-                    <strong>{phaseCheckData.isTwoConductor ? 'Multimeter Connection:' : 'Step 2: Test Phase'}</strong>
+                    <strong>{phaseCheckData.isTwoConductor ? 'Analog Meter Connection:' : 'Step 2: Test Phase'}</strong>
                   </p>
                   <p className="text-xs text-gray-300">
                     <strong className="text-red-400">Red (+) Lead:</strong> Connect to{' '}
@@ -1220,7 +1322,7 @@ function HumbuckerAnalyzer() {
               )}
 
               <div>
-                <label className="block text-sm font-semibold text-gray-300 mb-2">Phase Direction (Multimeter Needle):</label>
+                <label className="block text-sm font-semibold text-gray-300 mb-2">Phase Direction (Analog Meter Needle):</label>
                 <select
                   value={phaseCheckData.phaseDirection}
                   onChange={(e) => setPhaseCheckData({ ...phaseCheckData, phaseDirection: e.target.value })}
@@ -1284,7 +1386,7 @@ function HumbuckerAnalyzer() {
                   }}
                   className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  {presetDatabase.map((preset, idx) => (
+                  {allPresets.map((preset, idx) => (
                     <option key={idx} value={preset.name}>{preset.name}</option>
                   ))}
                 </select>
@@ -1294,11 +1396,51 @@ function HumbuckerAnalyzer() {
               {wizardData[`pickup${wizardStep}`].isCustom && (
                 <div className="bg-gray-700 rounded-lg p-4 space-y-4">
                   <h3 className="font-bold text-yellow-400">Manual Wire Color Input</h3>
-                  
+
+                  {/* Brand and Name Input Fields */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Pickup Brand/Manufacturer (optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={wizardData[`pickup${wizardStep}`].customBrand}
+                        onChange={(e) => setWizardData({
+                          ...wizardData,
+                          [`pickup${wizardStep}`]: {
+                            ...wizardData[`pickup${wizardStep}`],
+                            customBrand: e.target.value
+                          }
+                        })}
+                        placeholder="e.g., Custom Shop, DIY, etc."
+                        className="w-full bg-gray-600 text-white border border-gray-500 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Pickup Name/Model (optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={wizardData[`pickup${wizardStep}`].customName}
+                        onChange={(e) => setWizardData({
+                          ...wizardData,
+                          [`pickup${wizardStep}`]: {
+                            ...wizardData[`pickup${wizardStep}`],
+                            customName: e.target.value
+                          }
+                        })}
+                        placeholder="e.g., Hot Bridge, Custom Neck, etc."
+                        className="w-full bg-gray-600 text-white border border-gray-500 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+
                   {/* Detailed Testing Instructions */}
                   <div className="bg-gray-700 rounded-lg p-4 border-2 border-yellow-500">
                     <h3 className="font-bold text-yellow-400 mb-3 flex items-center gap-2">
-                      <span className="text-xl">⚡</span> Multimeter Phase Testing Instructions
+                      <span className="text-xl">⚡</span> Analog Meter Phase Testing Instructions
                     </h3>
                     <div className="space-y-3 text-sm text-gray-200">
                       <div className="font-semibold text-yellow-300">Test Each Coil Individually:</div>
@@ -1310,7 +1452,7 @@ function HumbuckerAnalyzer() {
                           <div>2. <span className="bg-gray-800 px-1 rounded font-semibold">BLACK lead (−)</span> → Connect to North Finish wire</div>
                           <div>3. Place screwdriver flat on North coil pole pieces</div>
                           <div>4. <span className="text-yellow-300 font-semibold">Rapidly pull screwdriver off</span> the poles</div>
-                          <div>5. Watch multimeter needle as you pull off</div>
+                          <div>5. Watch analog meter needle as you pull off</div>
                         </div>
                       </div>
                       
@@ -1321,7 +1463,7 @@ function HumbuckerAnalyzer() {
                           <div>2. <span className="bg-gray-800 px-1 rounded font-semibold">BLACK lead (−)</span> → Connect to South Finish wire</div>
                           <div>3. Place screwdriver flat on South coil pole pieces</div>
                           <div>4. <span className="text-yellow-300 font-semibold">Rapidly pull screwdriver off</span> the poles</div>
-                          <div>5. Watch multimeter needle as you pull off</div>
+                          <div>5. Watch analog meter needle as you pull off</div>
                         </div>
                       </div>
                       
@@ -1562,19 +1704,19 @@ function HumbuckerAnalyzer() {
                 </div>
               )}
               
-              {/* Multimeter Testing Instructions - Only for preset pickups */}
+              {/* Analog Meter Testing Instructions - Only for preset pickups */}
               {!wizardData[`pickup${wizardStep}`].isCustom && wizardData[`pickup${wizardStep}`].preset && (() => {
-                const selectedPreset = presetDatabase.find(p => p.name === wizardData[`pickup${wizardStep}`].preset);
+                const selectedPreset = allPresets.find(p => p.name === wizardData[`pickup${wizardStep}`].preset);
                 if (!selectedPreset || !selectedPreset.manufacturer) return null;
                 
                 return (
                   <div className="bg-gray-700 rounded-lg p-4 border-2 border-yellow-500">
                     <h3 className="font-bold text-yellow-400 mb-3 flex items-center gap-2">
-                      <span className="text-xl">⚡</span> Multimeter Phase Testing Instructions
+                      <span className="text-xl">⚡</span> Analog Meter Phase Testing Instructions
                     </h3>
                     <div className="space-y-3 text-sm text-gray-200">
                       <div>
-                        <div className="font-semibold text-white mb-1">Step 1: Connect Multimeter Leads</div>
+                        <div className="font-semibold text-white mb-1">Step 1: Connect Analog Meter Leads</div>
                         <div className="ml-4">
                           • <span className="text-red-400">RED lead (+)</span> → <span className="font-bold text-white">{selectedPreset.north.positive} wire</span> (North Start/Ground wire)
                         </div>
@@ -1604,7 +1746,7 @@ function HumbuckerAnalyzer() {
                           • <span className="text-yellow-300 font-semibold">Rapidly pull the screwdriver off</span> the poles
                         </div>
                         <div className="ml-4">
-                          • Watch the multimeter needle as you pull off
+                          • Watch the analog meter needle as you pull off
                         </div>
                       </div>
                       
@@ -1621,7 +1763,7 @@ function HumbuckerAnalyzer() {
               {!wizardData[`pickup${wizardStep}`].isCustom && (
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Multimeter Phase Test Result
+                    Analog Meter Phase Test Result
                   </label>
                   <div className="grid grid-cols-2 gap-4">
                     <button
@@ -1703,6 +1845,27 @@ function HumbuckerAnalyzer() {
               >
                 {wizardStep === 1 ? 'Next →' : 'Complete Setup'}
               </button>
+
+              {/* Share with Community button - only show for custom pickups */}
+              {CONFIG?.ENABLE_SHARE_BUTTON && wizardData[`pickup${wizardStep}`]?.isCustom && (
+                <button
+                  onClick={() => shareCustomPickupWithCommunity(wizardStep)}
+                  disabled={(() => {
+                    const currentData = wizardData[`pickup${wizardStep}`];
+                    // Only require wire colors
+                    const hasAllColors = currentData.customColors.northPositive &&
+                                        currentData.customColors.northNegative &&
+                                        currentData.customColors.southPositive &&
+                                        currentData.customColors.southNegative;
+                    return !hasAllColors;
+                  })()}
+                  className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2"
+                  title="Share this custom pickup with the community database (only wire colors required)"
+                >
+                  <Upload size={20} />
+                  Share with Community
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -2130,7 +2293,7 @@ function HumbuckerAnalyzer() {
                     className="w-full bg-gray-700 text-white border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 print:bg-white print:text-black print:border-gray-400"
                     defaultValue=""
                   >
-                    {presetDatabase.map((preset, idx) => (
+                    {allPresets.map((preset, idx) => (
                       <option key={idx} value={preset.name}>{preset.name}</option>
                     ))}
                   </select>
@@ -2189,7 +2352,7 @@ function HumbuckerAnalyzer() {
                   />
 
                   <div className="bg-gray-700/50 p-4 rounded print:bg-gray-100">
-                    <h4 className="font-semibold mb-3 text-green-300 print:text-black">Positive (+) Multimeter Terminal</h4>
+                    <h4 className="font-semibold mb-3 text-green-300 print:text-black">Positive (+) Analog Meter Terminal</h4>
                     <ColorSelect 
                       value={pickup.coils.north.positive.color}
                       onChange={(v) => updateCoil(pickupIndex, 'north', 'positive', 'color', v)}
@@ -2198,7 +2361,7 @@ function HumbuckerAnalyzer() {
                   </div>
 
                   <div className="bg-gray-700/50 p-4 rounded print:bg-gray-100">
-                    <h4 className="font-semibold mb-3 text-green-300 print:text-black">Negative (-) Multimeter Terminal</h4>
+                    <h4 className="font-semibold mb-3 text-green-300 print:text-black">Negative (-) Analog Meter Terminal</h4>
                     <ColorSelect 
                       value={pickup.coils.north.negative.color}
                       onChange={(v) => updateCoil(pickupIndex, 'north', 'negative', 'color', v)}
@@ -2232,7 +2395,7 @@ function HumbuckerAnalyzer() {
                   />
 
                   <div className="bg-gray-700/50 p-4 rounded print:bg-gray-100">
-                    <h4 className="font-semibold mb-3 text-purple-300 print:text-black">Positive (+) Multimeter Terminal</h4>
+                    <h4 className="font-semibold mb-3 text-purple-300 print:text-black">Positive (+) Analog Meter Terminal</h4>
                     <ColorSelect 
                       value={pickup.coils.south.positive.color}
                       onChange={(v) => updateCoil(pickupIndex, 'south', 'positive', 'color', v)}
@@ -2241,7 +2404,7 @@ function HumbuckerAnalyzer() {
                   </div>
 
                   <div className="bg-gray-700/50 p-4 rounded print:bg-gray-100">
-                    <h4 className="font-semibold mb-3 text-purple-300 print:text-black">Negative (-) Multimeter Terminal</h4>
+                    <h4 className="font-semibold mb-3 text-purple-300 print:text-black">Negative (-) Analog Meter Terminal</h4>
                     <ColorSelect 
                       value={pickup.coils.south.negative.color}
                       onChange={(v) => updateCoil(pickupIndex, 'south', 'negative', 'color', v)}
@@ -2285,7 +2448,7 @@ function HumbuckerAnalyzer() {
             
             <div className="border-t border-gray-600 pt-4 print:border-gray-300">
               <h3 className="font-semibold text-yellow-300 mb-2 print:text-black">Phase Test (Screwdriver Pull-Off):</h3>
-              <p><strong>Setup:</strong> Connect analog multimeter leads to coil terminals, set to lowest DC voltage range.</p>
+              <p><strong>Setup:</strong> Connect analog analog meter leads to coil terminals, set to lowest DC voltage range.</p>
               <p><strong>Test:</strong> Quickly pull a screwdriver away from the pole pieces while watching the needle.</p>
               <p><strong>← Needle jumps LEFT</strong></p>
               <p><strong>→ Needle jumps RIGHT</strong></p>

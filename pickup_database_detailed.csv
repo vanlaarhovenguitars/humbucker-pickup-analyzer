@@ -1,0 +1,37 @@
+Preset Name,Manufacturer,North Coil: RED lead (+),North Coil: BLACK lead (−),North Pole Type,South Coil: RED lead (+),South Coil: BLACK lead (−),South Pole Type,Series Wire 1 (North Finish),Series Wire 2 (South Start),STANDARD Ground Wire,STANDARD Hot Wire,PHASE REVERSED Ground Wire,PHASE REVERSED Hot Wire,Notes
+Seymour Duncan,Seymour Duncan,Green,Red,Slug,White,Black,Screw,Red,White,Green,Black,Black,Green,Standard 4-conductor pattern
+Duncan Designed,Duncan Designed,Green,Red,Slug,White,Black,Screw,Red,White,Green,Black,Black,Green,Same as Seymour Duncan
+DiMarzio,DiMarzio,Green,Black,Slug,White,Red,Screw,Black,White,Green,Red,Red,Green,Standard DiMarzio pattern
+Gibson (Aftermarket),Gibson,Black,White,Slug,Green,Red,Screw,White,Green,Black,Red,Red,Black,Aftermarket 4-conductor
+Gibson (Stock/Vintage),Gibson,Black,Bare/Shield,Slug,Bare/Shield,Black,Screw,Bare/Shield,Bare/Shield,Black,Black,Black,Black,Vintage 2-conductor (same wire both ends)
+Fender (Humbucker),Fender,Green,Red,Slug,Black,White,Screw,Red,Black,Green,White,White,Green,Fender humbucker pattern
+Jackson,Jackson,Green,Red,Slug,Black,White,Screw,Red,Black,Green,White,White,Green,Same as Fender
+Peavey,Peavey,Yellow,Orange,Slug,Green,Red,Screw,Orange,Green,Yellow,Red,Red,Yellow,Unique color scheme
+Iron Gear,Iron Gear,Yellow,Red,Slug,Green,White,Screw,Red,Green,Yellow,White,White,Yellow,Yellow hot wire
+Ibanez,Ibanez,Blue,Red,Slug,Green,White,Screw,Red,Green,Blue,White,White,Blue,Blue hot wire
+Rockfield,Rockfield,Black,Red,Slug,Green,White,Screw,Red,Green,Black,White,White,Black,Standard pattern
+TDM,TDM,Yellow,Red,Slug,Green,White,Screw,Red,Green,Yellow,White,White,Yellow,Yellow hot wire
+GFS,GFS,Black,Red,Slug,Green,White,Screw,Red,Green,Black,White,White,Black,Standard pattern
+Swinehead,Swinehead,Red,White,Slug,Green,Black,Screw,White,Green,Red,Black,Black,Red,Reversed from DiMarzio
+EMG (Passive),EMG,Red,Black,Slug,Bare/Shield,White,Screw,Black,Bare/Shield,Red,White,White,Red,Passive EMG pattern
+EMG HZ,EMG,Black,Red,Slug,Green,White,Screw,Red,Green,Black,White,White,Black,EMG HZ series
+All Active (Seymour Duncan),Seymour Duncan,Red,Black,Slug,Bare/Shield,White,Screw,Black,Bare/Shield,Red,White,White,Red,Active pickup pattern
+Lawrence,Lawrence,Red,Black,Slug,Green,White,Screw,Black,Green,Red,White,White,Red,Standard pattern
+Bare Knuckle,Bare Knuckle,Black,Red,Slug,Green,White,Screw,Red,Green,Black,White,White,Black,Standard pattern
+Gotoh,Gotoh,Yellow,Red,Slug,Green,White,Screw,Red,Green,Yellow,White,White,Yellow,Yellow hot wire
+Bill Lawrence,Bill Lawrence,Black,Red,Slug,Green,White,Screw,Red,Green,Black,White,White,Black,Standard pattern
+Carvin/Kiesel,Carvin/Kiesel,Black,Red,Slug,Green,White,Screw,Red,Green,Black,White,White,Black,Standard pattern
+Dean USA,Dean USA,Black,Red,Slug,Green,White,Screw,Red,Green,Black,White,White,Black,Standard pattern
+Fralin,Fralin,Black,Red,Slug,Green,White,Screw,Red,Green,Black,White,White,Black,Standard pattern
+Golden Age (4-Conductor),Golden Age,Black,Red,Slug,Green,White,Screw,Red,Green,Black,White,White,Black,Standard pattern
+Joe Barden,Joe Barden,Black,Red,Slug,Green,White,Screw,Red,Green,Black,White,White,Black,Standard pattern
+Kent Armstrong,Kent Armstrong,Black,Red,Slug,Green,White,Screw,Red,Green,Black,White,White,Black,Standard pattern
+Lollar,Lollar Pickups,Black,Red,Slug,Green,White,Screw,Red,Green,Black,White,White,Black,Standard pattern
+Lundgren,Lundgren,Black,Red,Slug,Green,White,Screw,Red,Green,Black,White,White,Black,Standard pattern
+MAMA Pickups,MAMA Pickups,Black,Red,Slug,Green,White,Screw,Red,Green,Black,White,White,Black,Standard pattern
+Mighty Mite,Mighty Mite,Black,Red,Slug,Green,White,Screw,Red,Green,Black,White,White,Black,Standard pattern
+PRS (Paul Reed Smith),PRS,Black,Red,Slug,Green,White,Screw,Red,Green,Black,White,White,Black,Standard pattern
+Rio Grande,Rio Grande,Black,Red,Slug,Green,White,Screw,Red,Green,Black,White,White,Black,Standard pattern
+Schaller,Schaller,Black,Red,Slug,Green,White,Screw,Red,Green,Black,White,White,Black,Standard pattern
+Suhr,Suhr,Black,Red,Slug,Green,White,Screw,Red,Green,Black,White,White,Black,Standard pattern
+Tone Rider,Tone Rider,Black,Red,Slug,Green,White,Screw,Red,Green,Black,White,White,Black,Standard pattern

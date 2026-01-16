@@ -25,7 +25,7 @@ Simply open `index.html` in a web browser. No server or installation required.
 
 ## For Guitar Technicians
 
-This tool uses the practical "pull off rapidly" multimeter testing technique for phase verification. All manufacturer data has been verified against actual pickup specifications.
+This tool uses the practical "pull off rapidly" analog meter testing technique for phase verification. All manufacturer data has been verified against actual pickup specifications.
 
 ## About
 
