@@ -1502,8 +1502,8 @@ function HumbuckerAnalyzer() {
 
       {/* Setup Wizard Modal */}
       {showSetupWizard && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-gray-800 rounded-lg p-8 max-w-3xl w-full my-8">
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-start md:items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-gray-800 rounded-lg p-6 md:p-8 max-w-3xl w-full my-2 md:my-8">
             <h2 className="text-3xl font-bold text-blue-400 mb-6">
               {wizardStep === 0 ? 'Select Your Phase Testing Method' : `Setup Pickup ${wizardStep}`}
             </h2>
