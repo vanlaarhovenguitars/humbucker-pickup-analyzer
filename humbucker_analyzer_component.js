@@ -189,26 +189,32 @@ function HumbuckerAnalyzer() {
 
   // Normalize phase value to "negative" or "positive" for cross-method compatibility
   const normalizePhase = (phaseValue) => {
+    if (!phaseValue) return null;
+
+    const valueStr = String(phaseValue).toLowerCase();
+
     // All "left/down/red" values are negative phase
-    if (phaseValue && (
-      phaseValue.includes('Left') ||
-      phaseValue.includes('Down') ||
-      phaseValue.includes('Red') ||
-      phaseValue.includes('↓') ||
-      phaseValue.includes('←') ||
-      phaseValue.includes('🔴')
-    )) {
+    if (
+      valueStr.includes('left') ||
+      valueStr.includes('down') ||
+      valueStr.includes('red') ||
+      valueStr.includes('↓') ||
+      valueStr.includes('←') ||
+      valueStr.includes('🔴') ||
+      valueStr.includes('negative')
+    ) {
       return 'negative';
     }
     // All "right/up/green" values are positive phase
-    if (phaseValue && (
-      phaseValue.includes('Right') ||
-      phaseValue.includes('Up') ||
-      phaseValue.includes('Green') ||
-      phaseValue.includes('↑') ||
-      phaseValue.includes('→') ||
-      phaseValue.includes('🟢')
-    )) {
+    if (
+      valueStr.includes('right') ||
+      valueStr.includes('up') ||
+      valueStr.includes('green') ||
+      valueStr.includes('↑') ||
+      valueStr.includes('→') ||
+      valueStr.includes('🟢') ||
+      valueStr.includes('positive')
+    ) {
       return 'positive';
     }
     return null;
@@ -220,12 +226,15 @@ function HumbuckerAnalyzer() {
 
     const instructions = getPhaseInstructions(phaseTestingMethod);
 
-    // First try direct match
+    // First try direct match with current method
     const directMatch = instructions.phaseOptions.find(opt => opt.value === phaseValue);
-    if (directMatch) return directMatch.display;
+    if (directMatch) {
+      return directMatch.display;
+    }
 
     // If no direct match, normalize and convert to current method
     const normalized = normalizePhase(phaseValue);
+
     if (normalized === 'negative') {
       // Return the first option (which is always negative/left/down/red)
       return instructions.phaseOptions[0].display;
@@ -234,7 +243,29 @@ function HumbuckerAnalyzer() {
       return instructions.phaseOptions[1].display;
     }
 
+    // Fallback: return original value
     return phaseValue;
+  };
+
+  // Flip phase value to opposite (for phase reversal)
+  const flipPhaseValue = (currentPhase) => {
+    const instructions = getPhaseInstructions(phaseTestingMethod);
+    const normalized = normalizePhase(currentPhase);
+
+    if (normalized === 'negative') {
+      // Flip to positive (second option)
+      return instructions.phaseOptions[1].value;
+    } else if (normalized === 'positive') {
+      // Flip to negative (first option)
+      return instructions.phaseOptions[0].value;
+    }
+
+    // Fallback: return analog values
+    if (currentPhase && currentPhase.includes('Left')) {
+      return '→ Right';
+    } else {
+      return '← Left';
+    }
   };
 
   // Preset database based on official pickup color code charts
@@ -625,12 +656,8 @@ function HumbuckerAnalyzer() {
       updated[pickupIndex].coils[coil].positive.color = updated[pickupIndex].coils[coil].negative.color;
       updated[pickupIndex].coils[coil].negative.color = temp;
       
-      // Reverse the phase direction
-      if (updated[pickupIndex].coils[coil].phase.includes('Left')) {
-        updated[pickupIndex].coils[coil].phase = '→ Right';
-      } else {
-        updated[pickupIndex].coils[coil].phase = '← Left';
-      }
+      // Reverse the phase direction using current testing method
+      updated[pickupIndex].coils[coil].phase = flipPhaseValue(updated[pickupIndex].coils[coil].phase);
     } else if (phaseWarningData.type === 'one-2-conductor') {
       // Reverse the 4-conductor pickup (whichever one that is)
       const pickupToReverse = phaseWarningData.whichIs2Conductor === 'current' 
@@ -642,22 +669,14 @@ function HumbuckerAnalyzer() {
       updated[pickupToReverse].coils.north.positive.color = updated[pickupToReverse].coils.north.negative.color;
       updated[pickupToReverse].coils.north.negative.color = temp;
       
-      if (updated[pickupToReverse].coils.north.phase.includes('Left')) {
-        updated[pickupToReverse].coils.north.phase = '→ Right';
-      } else {
-        updated[pickupToReverse].coils.north.phase = '← Left';
-      }
+      updated[pickupToReverse].coils.north.phase = flipPhaseValue(updated[pickupToReverse].coils.north.phase);
       
       // Reverse South coil
       temp = updated[pickupToReverse].coils.south.positive.color;
       updated[pickupToReverse].coils.south.positive.color = updated[pickupToReverse].coils.south.negative.color;
       updated[pickupToReverse].coils.south.negative.color = temp;
       
-      if (updated[pickupToReverse].coils.south.phase.includes('Left')) {
-        updated[pickupToReverse].coils.south.phase = '→ Right';
-      } else {
-        updated[pickupToReverse].coils.south.phase = '← Left';
-      }
+      updated[pickupToReverse].coils.south.phase = flipPhaseValue(updated[pickupToReverse].coils.south.phase);
     } else if (phaseWarningData.type === 'both-4-conductor' || 
                phaseWarningData.type === 'cross-pickup' || 
                phaseWarningData.type === 'cross-pickup-2conductor-current') {
@@ -2425,7 +2444,7 @@ function HumbuckerAnalyzer() {
         {pickups.length > 1 && (
           <div className="bg-gray-800 rounded-lg p-6 mb-6 print:border print:border-gray-300">
             <h2 className="text-xl font-semibold mb-4 text-blue-300 print:text-black">Visual Comparison</h2>
-            <div className={`grid grid-cols-1 ${pickups.length === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-4`}>
+            <div className={`grid grid-cols-1 ${pickups.length === 2 ? 'md:grid-cols-2 print:grid-cols-2' : 'md:grid-cols-3 print:grid-cols-3'} gap-4`}>
               {pickups.map((pickup, index) => (
                 <div key={pickup.id} className="border border-gray-700 rounded-lg p-4 print:border-gray-300">
                   <h3 className="text-center text-sm font-semibold mb-2 text-gray-300 print:text-black">
