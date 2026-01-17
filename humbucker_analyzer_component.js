@@ -1353,6 +1353,34 @@ function HumbuckerAnalyzer() {
       return;
     }
 
+    // Check for phase mismatch if both phases are entered
+    if (pickupData.northPhase && pickupData.southPhase) {
+      if (pickupData.northPhase !== pickupData.southPhase) {
+        const confirm = window.confirm(
+          'Phase Mismatch Detected!\n\n' +
+          'The North and South coils have opposite phase directions. For a humbucker to work properly, ' +
+          'both coils should have the same phase.\n\n' +
+          `North Coil: ${getPhaseDisplay(pickupData.northPhase)}\n` +
+          `South Coil: ${getPhaseDisplay(pickupData.southPhase)}\n\n` +
+          'Would you like to flip the South coil phase to match the North coil before sharing?'
+        );
+
+        if (confirm) {
+          // Flip the south phase to match north
+          const flippedSouthPhase = flipPhaseValue(pickupData.southPhase);
+          setWizardData({
+            ...wizardData,
+            [`pickup${pickupStep}`]: {
+              ...wizardData[`pickup${pickupStep}`],
+              southPhase: flippedSouthPhase
+            }
+          });
+          alert('South coil phase has been flipped to match the North coil. Please click "Share with Community" again.');
+          return;
+        }
+      }
+    }
+
     // Prepare data for the form
     const formData = {
       manufacturer: pickupData.customBrand || '',
@@ -1363,7 +1391,7 @@ function HumbuckerAnalyzer() {
       southRed: pickupData.customColors.southPositive,
       southBlack: pickupData.customColors.southNegative,
       southPole: pickupData.southPoleType,
-      notes: `North Phase: ${pickupData.northPhase}, South Phase: ${pickupData.southPhase}`
+      notes: `North Phase: ${pickupData.northPhase || 'Not tested'}, South Phase: ${pickupData.southPhase || 'Not tested'}`
     };
 
     // Generate pre-filled form URL
@@ -2401,16 +2429,15 @@ function HumbuckerAnalyzer() {
                   onClick={() => shareCustomPickupWithCommunity(wizardStep)}
                   disabled={(() => {
                     const currentData = wizardData[`pickup${wizardStep}`];
-                    // Require wire colors AND phase testing
+                    // Only require wire colors (phase testing is optional)
                     const hasAllColors = currentData.customColors.northPositive &&
                                         currentData.customColors.northNegative &&
                                         currentData.customColors.southPositive &&
                                         currentData.customColors.southNegative;
-                    const hasPhaseTests = currentData.northPhase && currentData.southPhase;
-                    return !hasAllColors || !hasPhaseTests;
+                    return !hasAllColors;
                   })()}
                   className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2"
-                  title="Share this custom pickup with the community database (requires wire colors and phase testing)"
+                  title="Share this custom pickup with the community database (wire colors required, phase testing optional)"
                 >
                   <Upload size={20} />
                   Share with Community
