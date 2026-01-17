@@ -2404,7 +2404,7 @@ function HumbuckerAnalyzer() {
         </div>
 
         {/* Looth Tool Advertisement */}
-        <div className="bg-gradient-to-r from-blue-900 to-purple-900 rounded-lg p-6 mb-6 border-2 border-blue-500 print:border print:border-gray-300 print:bg-white">
+        <div className="bg-gradient-to-r from-blue-900 to-purple-900 rounded-lg p-6 mb-6 border-2 border-blue-500 print:hidden">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex-1 min-w-[250px]">
               <h2 className="text-2xl font-bold text-blue-300 mb-2 print:text-black">
