@@ -687,23 +687,15 @@ function HumbuckerAnalyzer() {
       let temp = updated[pickupIndex].coils.north.positive.color;
       updated[pickupIndex].coils.north.positive.color = updated[pickupIndex].coils.north.negative.color;
       updated[pickupIndex].coils.north.negative.color = temp;
-      
-      if (updated[pickupIndex].coils.north.phase.includes('Left')) {
-        updated[pickupIndex].coils.north.phase = '→ Right';
-      } else {
-        updated[pickupIndex].coils.north.phase = '← Left';
-      }
-      
+
+      updated[pickupIndex].coils.north.phase = flipPhaseValue(updated[pickupIndex].coils.north.phase);
+
       // Reverse South coil
       temp = updated[pickupIndex].coils.south.positive.color;
       updated[pickupIndex].coils.south.positive.color = updated[pickupIndex].coils.south.negative.color;
       updated[pickupIndex].coils.south.negative.color = temp;
-      
-      if (updated[pickupIndex].coils.south.phase.includes('Left')) {
-        updated[pickupIndex].coils.south.phase = '→ Right';
-      } else {
-        updated[pickupIndex].coils.south.phase = '← Left';
-      }
+
+      updated[pickupIndex].coils.south.phase = flipPhaseValue(updated[pickupIndex].coils.south.phase);
       
       // Toggle isReversed flag
       updated[pickupIndex].isReversed = !updated[pickupIndex].isReversed;
@@ -877,7 +869,7 @@ function HumbuckerAnalyzer() {
           </text>
         )}
         {/* Phase arrow for North coil - LEFT */}
-        {pickup.coils.north.phase && pickup.coils.north.phase.includes('Left') && (
+        {pickup.coils.north.phase && normalizePhase(pickup.coils.north.phase) === 'negative' && (
           <g>
             <path d="M 25 210 L 15 220 L 25 230" stroke="#fbbf24" strokeWidth="3" fill="none" className="print:stroke-black"/>
             <text x="10" y="207" fontSize="10" fill="#fbbf24" fontWeight="bold" className="print:fill-black">←</text>
@@ -900,7 +892,7 @@ function HumbuckerAnalyzer() {
           </text>
         )}
         {/* Phase arrow for North coil - RIGHT */}
-        {pickup.coils.north.phase && pickup.coils.north.phase.includes('Right') && (
+        {pickup.coils.north.phase && normalizePhase(pickup.coils.north.phase) === 'positive' && (
           <g>
             <path d="M 675 210 L 685 220 L 675 230" stroke="#fbbf24" strokeWidth="3" fill="none" className="print:stroke-black"/>
             <text x="680" y="207" fontSize="10" fill="#fbbf24" fontWeight="bold" className="print:fill-black">→</text>
@@ -1004,7 +996,7 @@ function HumbuckerAnalyzer() {
           })()
         )}
         {/* Phase arrow for South coil - LEFT */}
-        {pickup.coils.south.phase && pickup.coils.south.phase.includes('Left') && (
+        {pickup.coils.south.phase && normalizePhase(pickup.coils.south.phase) === 'negative' && (
           <g>
             <path d="M 25 370 L 15 380 L 25 390" stroke="#fbbf24" strokeWidth="3" fill="none" className="print:stroke-black"/>
             <text x="10" y="367" fontSize="10" fill="#fbbf24" fontWeight="bold" className="print:fill-black">←</text>
@@ -1027,7 +1019,7 @@ function HumbuckerAnalyzer() {
           </text>
         )}
         {/* Phase arrow for South coil - RIGHT */}
-        {pickup.coils.south.phase && pickup.coils.south.phase.includes('Right') && (
+        {pickup.coils.south.phase && normalizePhase(pickup.coils.south.phase) === 'positive' && (
           <g>
             <path d="M 675 370 L 685 380 L 675 390" stroke="#fbbf24" strokeWidth="3" fill="none" className="print:stroke-black"/>
             <text x="680" y="367" fontSize="10" fill="#fbbf24" fontWeight="bold" className="print:fill-black">→</text>
