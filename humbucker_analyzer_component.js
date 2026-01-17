@@ -2265,75 +2265,40 @@ function HumbuckerAnalyzer() {
                 </button>
               )}
 
-              {/* Step 2: Add 3rd Pickup OR Complete Setup buttons */}
+              {/* Step 2: Complete Setup (primary) */}
               {wizardStep === 2 && (
-                <>
-                  <button
-                    onClick={() => {
-                      const currentData = wizardData[`pickup${wizardStep}`];
-                      const isValid = currentData.preset && (
-                        !currentData.isCustom
-                          ? currentData.phase  // Preset needs phase
-                          : (currentData.northPhase && currentData.southPhase)  // Custom needs both phases
-                      );
+                <button
+                  onClick={() => {
+                    const currentData = wizardData[`pickup${wizardStep}`];
+                    const isValid = currentData.preset && (
+                      !currentData.isCustom
+                        ? currentData.phase  // Preset needs phase
+                        : (currentData.northPhase && currentData.southPhase)  // Custom needs both phases
+                    );
 
-                      if (!isValid) return;
+                    if (!isValid) return;
 
-                      // Check for phase mismatch in custom pickups
-                      if (currentData.isCustom && currentData.northPhase !== currentData.southPhase) {
-                        setCustomPhaseMismatchData({ pickupStep: wizardStep });
-                        setShowCustomPhaseMismatch(true);
-                        return;
-                      }
+                    // Check for phase mismatch in custom pickups
+                    if (currentData.isCustom && currentData.northPhase !== currentData.southPhase) {
+                      setCustomPhaseMismatchData({ pickupStep: wizardStep });
+                      setShowCustomPhaseMismatch(true);
+                      return;
+                    }
 
-                      setWizardStep(3);
-                      setShowInstructions(false);
-                    }}
-                    disabled={(() => {
-                      const currentData = wizardData[`pickup${wizardStep}`];
-                      if (!currentData.preset) return true;
-                      if (currentData.isCustom) {
-                        return !currentData.northPhase || !currentData.southPhase;
-                      }
-                      return !currentData.phase;
-                    })()}
-                    className="flex-1 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-semibold transition"
-                  >
-                    Add 3rd Pickup →
-                  </button>
-                  <button
-                    onClick={() => {
-                      const currentData = wizardData[`pickup${wizardStep}`];
-                      const isValid = currentData.preset && (
-                        !currentData.isCustom
-                          ? currentData.phase  // Preset needs phase
-                          : (currentData.northPhase && currentData.southPhase)  // Custom needs both phases
-                      );
-
-                      if (!isValid) return;
-
-                      // Check for phase mismatch in custom pickups
-                      if (currentData.isCustom && currentData.northPhase !== currentData.southPhase) {
-                        setCustomPhaseMismatchData({ pickupStep: wizardStep });
-                        setShowCustomPhaseMismatch(true);
-                        return;
-                      }
-
-                      completeWizard();
-                    }}
-                    disabled={(() => {
-                      const currentData = wizardData[`pickup${wizardStep}`];
-                      if (!currentData.preset) return true;
-                      if (currentData.isCustom) {
-                        return !currentData.northPhase || !currentData.southPhase;
-                      }
-                      return !currentData.phase;
-                    })()}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-semibold transition"
-                  >
-                    Complete Setup
-                  </button>
-                </>
+                    completeWizard();
+                  }}
+                  disabled={(() => {
+                    const currentData = wizardData[`pickup${wizardStep}`];
+                    if (!currentData.preset) return true;
+                    if (currentData.isCustom) {
+                      return !currentData.northPhase || !currentData.southPhase;
+                    }
+                    return !currentData.phase;
+                  })()}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-semibold transition"
+                >
+                  Complete Setup
+                </button>
               )}
 
               {/* Step 3: Complete Setup button */}
@@ -2393,6 +2358,45 @@ function HumbuckerAnalyzer() {
                 </button>
               )}
             </div>
+
+            {/* Subtle link to add 3rd pickup - only on step 2 */}
+            {wizardStep === 2 && (
+              <div className="mt-3 text-center">
+                <button
+                  onClick={() => {
+                    const currentData = wizardData[`pickup${wizardStep}`];
+                    const isValid = currentData.preset && (
+                      !currentData.isCustom
+                        ? currentData.phase  // Preset needs phase
+                        : (currentData.northPhase && currentData.southPhase)  // Custom needs both phases
+                    );
+
+                    if (!isValid) return;
+
+                    // Check for phase mismatch in custom pickups
+                    if (currentData.isCustom && currentData.northPhase !== currentData.southPhase) {
+                      setCustomPhaseMismatchData({ pickupStep: wizardStep });
+                      setShowCustomPhaseMismatch(true);
+                      return;
+                    }
+
+                    setWizardStep(3);
+                    setShowInstructions(false);
+                  }}
+                  disabled={(() => {
+                    const currentData = wizardData[`pickup${wizardStep}`];
+                    if (!currentData.preset) return true;
+                    if (currentData.isCustom) {
+                      return !currentData.northPhase || !currentData.southPhase;
+                    }
+                    return !currentData.phase;
+                  })()}
+                  className="text-sm text-gray-400 hover:text-blue-400 disabled:text-gray-600 disabled:cursor-not-allowed transition underline"
+                >
+                  + Add 3rd pickup (optional)
+                </button>
+              </div>
+            )}
             )}
           </div>
         </div>
@@ -2658,7 +2662,7 @@ function HumbuckerAnalyzer() {
         )}
 
         {/* Summary Section - Below Visual Comparison */}
-        {pickups.length === 2 && pickups[0].manufacturer && pickups[1].manufacturer && !showSetupWizard && (
+        {pickups.length >= 2 && pickups[0].manufacturer && pickups[1].manufacturer && !showSetupWizard && (
           <div className="bg-gray-800 rounded-lg p-6 mb-8 print:border print:border-gray-300 print:bg-white print:break-inside-avoid print:p-4">
             <div className="flex items-center justify-between mb-6 print:block print:mb-4">
               <h2 className="text-2xl font-bold text-blue-400 print:text-black print:text-xl print:mb-3">Pickup Summary</h2>
@@ -2671,7 +2675,7 @@ function HumbuckerAnalyzer() {
                 Print
               </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-6 print:gap-4">
+            <div className={`grid grid-cols-1 ${pickups.length === 3 ? 'md:grid-cols-3 print:grid-cols-3' : 'md:grid-cols-2 print:grid-cols-2'} gap-6 print:gap-4`}>
               {pickups.map((pickup, idx) => (
                 <div key={pickup.id} className="bg-gray-700 rounded-lg p-6 print:border print:border-gray-300 print:bg-white print:break-inside-avoid print:p-4">
                   <h3 className="text-xl font-bold text-blue-300 mb-4 print:text-black">

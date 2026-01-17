@@ -27,6 +27,18 @@ Simply open `index.html` in a web browser. No server or installation required.
 
 This tool uses the practical "pull off rapidly" analog meter testing technique for phase verification. All manufacturer data has been verified against actual pickup specifications.
 
+## Bug Reports & Feature Requests
+
+Found a bug or have a feature request? We welcome your feedback!
+
+**Report an issue:**
+1. Visit our [GitHub Issues page](https://github.com/vanlaarhovenguitars/humbucker-pickup-analyzer/issues)
+2. Click "New Issue"
+3. Describe the bug or feature request
+4. Include screenshots if applicable
+
+Your feedback helps make this tool better for the entire guitar tech community!
+
 ## About
 
 Created by Buck van Laarhoven  
