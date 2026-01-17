@@ -1619,9 +1619,18 @@ function HumbuckerAnalyzer() {
       {showSetupWizard && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-start md:items-center justify-center z-50 p-4 overflow-y-auto">
           <div className="bg-gray-800 rounded-lg p-6 md:p-8 max-w-3xl w-full my-2 md:my-8">
-            <h2 className="text-3xl font-bold text-blue-400 mb-6">
-              {wizardStep === 0 ? 'Select Your Phase Testing Method' : `Setup Pickup ${wizardStep}`}
-            </h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-3xl font-bold text-blue-400">
+                {wizardStep === 0 ? 'Select Your Phase Testing Method' : `Setup Pickup ${wizardStep}`}
+              </h2>
+              <button
+                onClick={() => setShowSetupWizard(false)}
+                className="text-gray-400 hover:text-white transition-colors text-2xl font-bold px-3 py-1"
+                title="Close wizard and use manual setup"
+              >
+                ✕
+              </button>
+            </div>
 
             {/* Step 0: Phase Testing Method Selection */}
             {wizardStep === 0 && (
