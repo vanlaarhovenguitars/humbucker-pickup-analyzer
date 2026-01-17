@@ -1863,17 +1863,20 @@ function HumbuckerAnalyzer() {
                       const instructions = getPhaseInstructions(phaseTestingMethod);
                       const currentPhase = wizardData[`pickup${wizardStep}`].northPhase;
                       const isSecondOption = currentPhase === instructions.phaseOptions[1].value;
+                      const noSelection = !currentPhase;
 
                       return (
                         <div className="mt-2">
                           <div className="text-xs text-gray-300 mb-2">North Coil Phase Test:</div>
                           <div className="flex items-center gap-2 bg-gray-800 rounded-full p-1 relative">
                             {/* Sliding background */}
-                            <div
-                              className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-blue-600 rounded-full transition-all duration-300 ease-in-out ${
-                                isSecondOption ? 'left-[calc(50%+2px)]' : 'left-1'
-                              }`}
-                            />
+                            {!noSelection && (
+                              <div
+                                className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-blue-600 rounded-full transition-all duration-300 ease-in-out ${
+                                  isSecondOption ? 'left-[calc(50%+2px)]' : 'left-1'
+                                }`}
+                              />
+                            )}
 
                             {/* Option buttons */}
                             {instructions.phaseOptions.map((option, idx) => (
@@ -1886,7 +1889,7 @@ function HumbuckerAnalyzer() {
                                 className="flex-1 relative z-10 py-2 px-2 rounded-full transition-colors text-center"
                               >
                                 <div className={`text-sm font-semibold transition-colors ${
-                                  currentPhase === option.value ? 'text-white' : 'text-gray-400'
+                                  currentPhase === option.value ? 'text-white' : noSelection ? 'text-gray-300' : 'text-gray-400'
                                 }`}>
                                   {option.label}
                                 </div>
@@ -1974,17 +1977,20 @@ function HumbuckerAnalyzer() {
                       const instructions = getPhaseInstructions(phaseTestingMethod);
                       const currentPhase = wizardData[`pickup${wizardStep}`].southPhase;
                       const isSecondOption = currentPhase === instructions.phaseOptions[1].value;
+                      const noSelection = !currentPhase;
 
                       return (
                         <div className="mt-2">
                           <div className="text-xs text-gray-300 mb-2">South Coil Phase Test:</div>
                           <div className="flex items-center gap-2 bg-gray-800 rounded-full p-1 relative">
                             {/* Sliding background */}
-                            <div
-                              className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-blue-600 rounded-full transition-all duration-300 ease-in-out ${
-                                isSecondOption ? 'left-[calc(50%+2px)]' : 'left-1'
-                              }`}
-                            />
+                            {!noSelection && (
+                              <div
+                                className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-blue-600 rounded-full transition-all duration-300 ease-in-out ${
+                                  isSecondOption ? 'left-[calc(50%+2px)]' : 'left-1'
+                                }`}
+                              />
+                            )}
 
                             {/* Option buttons */}
                             {instructions.phaseOptions.map((option, idx) => (
@@ -1997,7 +2003,7 @@ function HumbuckerAnalyzer() {
                                 className="flex-1 relative z-10 py-2 px-2 rounded-full transition-colors text-center"
                               >
                                 <div className={`text-sm font-semibold transition-colors ${
-                                  currentPhase === option.value ? 'text-white' : 'text-gray-400'
+                                  currentPhase === option.value ? 'text-white' : noSelection ? 'text-gray-300' : 'text-gray-400'
                                 }`}>
                                   {option.label}
                                 </div>
@@ -2138,6 +2144,8 @@ function HumbuckerAnalyzer() {
                 const instructions = getPhaseInstructions(phaseTestingMethod);
                 const currentPhase = wizardData[`pickup${wizardStep}`].phase;
                 const isSecondOption = currentPhase === instructions.phaseOptions[1].value;
+                const isFirstOption = currentPhase === instructions.phaseOptions[0].value;
+                const noSelection = !currentPhase;
 
                 return (
                   <div>
@@ -2146,11 +2154,13 @@ function HumbuckerAnalyzer() {
                     </label>
                     <div className="flex items-center justify-between gap-4 bg-gray-700 rounded-full p-2 relative">
                       {/* Sliding background */}
-                      <div
-                        className={`absolute top-2 bottom-2 w-[calc(50%-8px)] bg-blue-600 rounded-full transition-all duration-300 ease-in-out ${
-                          isSecondOption ? 'left-[calc(50%+4px)]' : 'left-2'
-                        }`}
-                      />
+                      {!noSelection && (
+                        <div
+                          className={`absolute top-2 bottom-2 w-[calc(50%-8px)] bg-blue-600 rounded-full transition-all duration-300 ease-in-out ${
+                            isSecondOption ? 'left-[calc(50%+4px)]' : 'left-2'
+                          }`}
+                        />
+                      )}
 
                       {/* Option buttons */}
                       {instructions.phaseOptions.map((option, idx) => (
@@ -2163,12 +2173,12 @@ function HumbuckerAnalyzer() {
                           className="flex-1 relative z-10 py-3 px-4 rounded-full transition-colors text-center"
                         >
                           <div className={`text-xl mb-1 transition-all ${
-                            currentPhase === option.value ? 'scale-110' : 'scale-100 opacity-60'
+                            currentPhase === option.value ? 'scale-110' : noSelection ? 'scale-100 opacity-100' : 'scale-100 opacity-60'
                           }`}>
                             {option.label.split(' ')[0]}
                           </div>
                           <div className={`text-xs font-semibold transition-colors ${
-                            currentPhase === option.value ? 'text-white' : 'text-gray-400'
+                            currentPhase === option.value ? 'text-white' : noSelection ? 'text-gray-300' : 'text-gray-400'
                           }`}>
                             {option.display}
                           </div>
