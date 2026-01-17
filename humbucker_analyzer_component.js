@@ -149,8 +149,8 @@ function HumbuckerAnalyzer() {
         ],
         question: 'Did the voltage go UP (positive) or DOWN (negative) when pulling off?',
         phaseOptions: [
-          { value: '↓ Down', label: '↓ Down', display: '↓ Down (Negative)' },
-          { value: '↑ Up', label: '↑ Up', display: '↑ Up (Positive)' }
+          { value: '↓ Down', label: 'Down (Negative)', display: '↓ Down (Negative)' },
+          { value: '↑ Up', label: 'Up (Positive)', display: '↑ Up (Positive)' }
         ],
         visualNote: 'DOWN (negative) = LEFT arrow | UP (positive) = RIGHT arrow in the pickup visualizer.',
         visualMappings: [
@@ -173,8 +173,8 @@ function HumbuckerAnalyzer() {
         ],
         question: 'Which LED lit up on the Phase Checker?',
         phaseOptions: [
-          { value: '🔴 Red', label: '🔴 Red', display: '🔴 Red (Negative Phase)' },
-          { value: '🟢 Green', label: '🟢 Green', display: '🟢 Green (Positive Phase)' }
+          { value: '🔴 Red', label: 'Red (Negative Phase)', display: '🔴 Red (Negative Phase)' },
+          { value: '🟢 Green', label: 'Green (Positive Phase)', display: '🟢 Green (Positive Phase)' }
         ],
         visualNote: 'RED LED = LEFT arrow | GREEN LED = RIGHT arrow in the pickup visualizer.',
         visualMappings: [
