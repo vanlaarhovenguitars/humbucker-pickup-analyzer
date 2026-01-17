@@ -37,6 +37,7 @@ function HumbuckerAnalyzer() {
   const [showSetupWizard, setShowSetupWizard] = useState(true);
   const [wizardStep, setWizardStep] = useState(0); // 0 = method selection, 1 = pickup 1, 2 = pickup 2
   const [phaseTestingMethod, setPhaseTestingMethod] = useState('analog'); // 'analog', 'digital', 'naudio'
+  const [showInstructions, setShowInstructions] = useState(false); // For collapsible instructions
   const [wizardData, setWizardData] = useState({
     pickup1: {
       preset: '',
@@ -111,7 +112,7 @@ function HumbuckerAnalyzer() {
   const getPhaseInstructions = (method) => {
     const instructions = {
       analog: {
-        title: '⚡ Analog Meter Phase Testing Instructions',
+        title: 'Analog Meter Phase Testing Instructions',
         deviceSetup: [
           'Set analog meter to lowest DC voltage range',
           'Analog meters use a moving needle indicator'
@@ -125,8 +126,8 @@ function HumbuckerAnalyzer() {
         ],
         question: 'Which direction did the needle move when pulling off?',
         phaseOptions: [
-          { value: '← Left', label: '← Left', display: '← Left' },
-          { value: '→ Right', label: '→ Right', display: '→ Right' }
+          { value: '← Left', label: '← Left', display: 'Left' },
+          { value: '→ Right', label: '→ Right', display: 'Right' }
         ],
         visualNote: 'The yellow arrow direction in the pickup visualizer matches your needle movement direction.',
         visualMappings: [
@@ -135,7 +136,7 @@ function HumbuckerAnalyzer() {
         ]
       },
       digital: {
-        title: '⚡ Digital Multimeter Phase Testing Instructions',
+        title: 'Digital Multimeter Phase Testing Instructions',
         deviceSetup: [
           'Set digital multimeter to DC voltage (lowest range)',
           'Digital meters show positive (+) or negative (-) values'
@@ -149,8 +150,8 @@ function HumbuckerAnalyzer() {
         ],
         question: 'Did the voltage go UP (positive) or DOWN (negative) when pulling off?',
         phaseOptions: [
-          { value: '↓ Down', label: '↓ Down', display: '↓ Down (Negative)' },
-          { value: '↑ Up', label: '↑ Up', display: '↑ Up (Positive)' }
+          { value: '↓ Down', label: '↓ Down (Negative)', display: 'Down (Negative)' },
+          { value: '↑ Up', label: '↑ Up (Positive)', display: 'Up (Positive)' }
         ],
         visualNote: 'DOWN (negative) = LEFT arrow | UP (positive) = RIGHT arrow in the pickup visualizer.',
         visualMappings: [
@@ -159,7 +160,7 @@ function HumbuckerAnalyzer() {
         ]
       },
       naudio: {
-        title: '⚡ N-Audio Phase Checker Instructions',
+        title: 'N-Audio Phase Checker Instructions',
         deviceSetup: [
           'Professional pickup phase testing device',
           'Learn more: N-Audio Guitar Pickup Phase Checker'
@@ -169,12 +170,13 @@ function HumbuckerAnalyzer() {
           { text: 'Connect coil start wire to Phase Checker input', highlight: null },
           { text: 'Connect coil finish wire to Phase Checker ground', highlight: null },
           { text: 'Power on the N-Audio Phase Checker device', highlight: null },
+          { text: 'Tap on the pickup with a large flat metal object', highlight: 'yellow' },
           { text: 'Read the LED indicator color', highlight: null }
         ],
         question: 'Which LED lit up on the Phase Checker?',
         phaseOptions: [
-          { value: '🔴 Red', label: '🔴 Red', display: '🔴 Red (Negative Phase)' },
-          { value: '🟢 Green', label: '🟢 Green', display: '🟢 Green (Positive Phase)' }
+          { value: '🔴 Red', label: '🔴 Red (Negative Phase)', display: 'Red (Negative Phase)' },
+          { value: '🟢 Green', label: '🟢 Green (Positive Phase)', display: 'Green (Positive Phase)' }
         ],
         visualNote: 'RED LED = LEFT arrow | GREEN LED = RIGHT arrow in the pickup visualizer.',
         visualMappings: [
@@ -1361,7 +1363,7 @@ function HumbuckerAnalyzer() {
       {showPhaseCheckModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 print:hidden">
           <div className="bg-gray-800 rounded-lg p-6 max-w-md border-2 border-blue-500">
-            <h3 className="text-xl font-bold text-blue-400 mb-4">⚡ Phase & Wiring Check</h3>
+            <h3 className="text-xl font-bold text-blue-400 mb-4">Phase & Wiring Check</h3>
             <p className="text-gray-300 mb-4">
               Before applying this preset, please verify the pickup wiring and phase direction.
             </p>
@@ -1501,8 +1503,8 @@ function HumbuckerAnalyzer() {
 
       {/* Setup Wizard Modal */}
       {showSetupWizard && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-gray-800 rounded-lg p-8 max-w-3xl w-full my-8">
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-start md:items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-gray-800 rounded-lg p-6 md:p-8 max-w-3xl w-full my-2 md:my-8">
             <h2 className="text-3xl font-bold text-blue-400 mb-6">
               {wizardStep === 0 ? 'Select Your Phase Testing Method' : `Setup Pickup ${wizardStep}`}
             </h2>
@@ -1612,7 +1614,10 @@ function HumbuckerAnalyzer() {
                 {/* Next Button */}
                 <div className="flex justify-end pt-4">
                   <button
-                    onClick={() => setWizardStep(1)}
+                    onClick={() => {
+                      setWizardStep(1);
+                      setShowInstructions(false);
+                    }}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition"
                   >
                     Next: Select Pickups →
@@ -1699,10 +1704,19 @@ function HumbuckerAnalyzer() {
                     const instructions = getPhaseInstructions(phaseTestingMethod);
                     return (
                       <div className="bg-gray-700 rounded-lg p-4 border-2 border-yellow-500">
-                        <h3 className="font-bold text-yellow-400 mb-3 flex items-center gap-2">
-                          <span className="text-xl">⚡</span> {instructions.title}
-                        </h3>
-                        <div className="space-y-3 text-sm text-gray-200">
+                        <button
+                          onClick={() => setShowInstructions(!showInstructions)}
+                          className="w-full flex items-center justify-between text-left hover:bg-gray-600 rounded p-2 -m-2 transition"
+                        >
+                          <h3 className="font-bold text-yellow-400">
+                            {instructions.title}
+                          </h3>
+                          <span className="text-yellow-400 text-xl">
+                            {showInstructions ? '−' : '+'}
+                          </span>
+                        </button>
+                        {showInstructions && (
+                        <div className="space-y-3 text-sm text-gray-200 mt-3">
                           {/* Device Setup Info */}
                           <div className="bg-gray-600 rounded p-2">
                             {instructions.deviceSetup.map((line, idx) => (
@@ -1768,10 +1782,11 @@ function HumbuckerAnalyzer() {
                             ))}
                           </div>
                         </div>
+                        )}
                       </div>
                     );
                   })()}
-                  
+
                   {/* North Coil */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
@@ -1846,10 +1861,21 @@ function HumbuckerAnalyzer() {
                     {/* North Coil Phase */}
                     {(() => {
                       const instructions = getPhaseInstructions(phaseTestingMethod);
+                      const currentPhase = wizardData[`pickup${wizardStep}`].northPhase;
+                      const isSecondOption = currentPhase === instructions.phaseOptions[1].value;
+
                       return (
                         <div className="mt-2">
-                          <div className="text-xs text-gray-300 mb-1">North Coil Phase Test:</div>
-                          <div className="grid grid-cols-2 gap-2">
+                          <div className="text-xs text-gray-300 mb-2">North Coil Phase Test:</div>
+                          <div className="flex items-center gap-2 bg-gray-800 rounded-full p-1 relative">
+                            {/* Sliding background */}
+                            <div
+                              className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-blue-600 rounded-full transition-all duration-300 ease-in-out ${
+                                isSecondOption ? 'left-[calc(50%+2px)]' : 'left-1'
+                              }`}
+                            />
+
+                            {/* Option buttons */}
                             {instructions.phaseOptions.map((option, idx) => (
                               <button
                                 key={idx}
@@ -1857,13 +1883,13 @@ function HumbuckerAnalyzer() {
                                   ...wizardData,
                                   [`pickup${wizardStep}`]: { ...wizardData[`pickup${wizardStep}`], northPhase: option.value }
                                 })}
-                                className={`p-2 rounded border-2 text-sm font-semibold ${
-                                  wizardData[`pickup${wizardStep}`].northPhase === option.value
-                                    ? 'border-blue-500 bg-blue-900 text-white'
-                                    : 'border-gray-600 bg-gray-800 text-gray-300'
-                                }`}
+                                className="flex-1 relative z-10 py-2 px-2 rounded-full transition-colors text-center"
                               >
-                                {option.label}
+                                <div className={`text-sm font-semibold transition-colors ${
+                                  currentPhase === option.value ? 'text-white' : 'text-gray-400'
+                                }`}>
+                                  {option.label}
+                                </div>
                               </button>
                             ))}
                           </div>
@@ -1946,10 +1972,21 @@ function HumbuckerAnalyzer() {
                     {/* South Coil Phase */}
                     {(() => {
                       const instructions = getPhaseInstructions(phaseTestingMethod);
+                      const currentPhase = wizardData[`pickup${wizardStep}`].southPhase;
+                      const isSecondOption = currentPhase === instructions.phaseOptions[1].value;
+
                       return (
                         <div className="mt-2">
-                          <div className="text-xs text-gray-300 mb-1">South Coil Phase Test:</div>
-                          <div className="grid grid-cols-2 gap-2">
+                          <div className="text-xs text-gray-300 mb-2">South Coil Phase Test:</div>
+                          <div className="flex items-center gap-2 bg-gray-800 rounded-full p-1 relative">
+                            {/* Sliding background */}
+                            <div
+                              className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-blue-600 rounded-full transition-all duration-300 ease-in-out ${
+                                isSecondOption ? 'left-[calc(50%+2px)]' : 'left-1'
+                              }`}
+                            />
+
+                            {/* Option buttons */}
                             {instructions.phaseOptions.map((option, idx) => (
                               <button
                                 key={idx}
@@ -1957,13 +1994,13 @@ function HumbuckerAnalyzer() {
                                   ...wizardData,
                                   [`pickup${wizardStep}`]: { ...wizardData[`pickup${wizardStep}`], southPhase: option.value }
                                 })}
-                                className={`p-2 rounded border-2 text-sm font-semibold ${
-                                  wizardData[`pickup${wizardStep}`].southPhase === option.value
-                                    ? 'border-blue-500 bg-blue-900 text-white'
-                                    : 'border-gray-600 bg-gray-800 text-gray-300'
-                                }`}
+                                className="flex-1 relative z-10 py-2 px-2 rounded-full transition-colors text-center"
                               >
-                                {option.label}
+                                <div className={`text-sm font-semibold transition-colors ${
+                                  currentPhase === option.value ? 'text-white' : 'text-gray-400'
+                                }`}>
+                                  {option.label}
+                                </div>
                               </button>
                             ))}
                           </div>
@@ -2001,10 +2038,19 @@ function HumbuckerAnalyzer() {
 
                 return (
                   <div className="bg-gray-700 rounded-lg p-4 border-2 border-yellow-500">
-                    <h3 className="font-bold text-yellow-400 mb-3 flex items-center gap-2">
-                      <span className="text-xl">⚡</span> {instructions.title}
-                    </h3>
-                    <div className="space-y-3 text-sm text-gray-200">
+                    <button
+                      onClick={() => setShowInstructions(!showInstructions)}
+                      className="w-full flex items-center justify-between text-left hover:bg-gray-600 rounded p-2 -m-2 transition"
+                    >
+                      <h3 className="font-bold text-yellow-400">
+                        {instructions.title}
+                      </h3>
+                      <span className="text-yellow-400 text-xl">
+                        {showInstructions ? '−' : '+'}
+                      </span>
+                    </button>
+                    {showInstructions && (
+                    <div className="space-y-3 text-sm text-gray-200 mt-3">
                       {/* Device Setup Info */}
                       <div className="bg-gray-600 rounded p-2">
                         {instructions.deviceSetup.map((line, idx) => (
@@ -2048,6 +2094,9 @@ function HumbuckerAnalyzer() {
                               • Power on the N-Audio Phase Checker device
                             </div>
                             <div className="ml-4">
+                              • <span className="text-yellow-300 font-semibold">Tap on the pickup with a large flat metal object</span>
+                            </div>
+                            <div className="ml-4">
                               • Read the LED indicator color
                             </div>
                           </>
@@ -2079,6 +2128,7 @@ function HumbuckerAnalyzer() {
                         ))}
                       </div>
                     </div>
+                    )}
                   </div>
                 );
               })()}
@@ -2086,12 +2136,23 @@ function HumbuckerAnalyzer() {
               {/* Phase Selection - Only for preset pickups */}
               {!wizardData[`pickup${wizardStep}`].isCustom && (() => {
                 const instructions = getPhaseInstructions(phaseTestingMethod);
+                const currentPhase = wizardData[`pickup${wizardStep}`].phase;
+                const isSecondOption = currentPhase === instructions.phaseOptions[1].value;
+
                 return (
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-3">
                       Phase Test Result
                     </label>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center justify-between gap-4 bg-gray-700 rounded-full p-2 relative">
+                      {/* Sliding background */}
+                      <div
+                        className={`absolute top-2 bottom-2 w-[calc(50%-8px)] bg-blue-600 rounded-full transition-all duration-300 ease-in-out ${
+                          isSecondOption ? 'left-[calc(50%+4px)]' : 'left-2'
+                        }`}
+                      />
+
+                      {/* Option buttons */}
                       {instructions.phaseOptions.map((option, idx) => (
                         <button
                           key={idx}
@@ -2099,14 +2160,18 @@ function HumbuckerAnalyzer() {
                             ...wizardData,
                             [`pickup${wizardStep}`]: { ...wizardData[`pickup${wizardStep}`], phase: option.value }
                           })}
-                          className={`p-4 rounded-lg border-2 transition ${
-                            wizardData[`pickup${wizardStep}`].phase === option.value
-                              ? 'border-blue-500 bg-blue-900 text-white'
-                              : 'border-gray-600 bg-gray-700 text-gray-300 hover:border-gray-500'
-                          }`}
+                          className="flex-1 relative z-10 py-3 px-4 rounded-full transition-colors text-center"
                         >
-                          <div className="text-2xl mb-2">{option.label.split(' ')[0]}</div>
-                          <div className="font-semibold">{option.display}</div>
+                          <div className={`text-xl mb-1 transition-all ${
+                            currentPhase === option.value ? 'scale-110' : 'scale-100 opacity-60'
+                          }`}>
+                            {option.label.split(' ')[0]}
+                          </div>
+                          <div className={`text-xs font-semibold transition-colors ${
+                            currentPhase === option.value ? 'text-white' : 'text-gray-400'
+                          }`}>
+                            {option.display}
+                          </div>
                         </button>
                       ))}
                     </div>
@@ -2121,7 +2186,10 @@ function HumbuckerAnalyzer() {
             <div className="flex gap-4 mt-8">
               {wizardStep === 2 && (
                 <button
-                  onClick={() => setWizardStep(1)}
+                  onClick={() => {
+                    setWizardStep(1);
+                    setShowInstructions(false);
+                  }}
                   className="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition"
                 >
                   ← Back
@@ -2147,6 +2215,7 @@ function HumbuckerAnalyzer() {
                   
                   if (wizardStep === 1) {
                     setWizardStep(2);
+                    setShowInstructions(false);
                   } else if (wizardStep === 2) {
                     completeWizard();
                   }
@@ -2434,11 +2503,11 @@ function HumbuckerAnalyzer() {
 
         {/* Visual Comparison - Side by Side */}
         {pickups.length > 1 && (
-          <div className="bg-gray-800 rounded-lg p-6 mb-6 print:border print:border-gray-300 print:hidden">
-            <h2 className="text-xl font-semibold mb-4 text-blue-300 print:text-black">Visual Comparison</h2>
-            <div className={`grid grid-cols-1 ${pickups.length === 2 ? 'md:grid-cols-2 print:grid-cols-2' : 'md:grid-cols-3 print:grid-cols-3'} gap-4`}>
+          <div className="bg-gray-800 rounded-lg p-6 mb-6 print:border print:border-gray-300 print:bg-white print:p-4 print:mb-4">
+            <h2 className="text-xl font-semibold mb-4 text-blue-300 print:text-black print:text-lg print:mb-3">Visual Comparison</h2>
+            <div className={`grid grid-cols-1 ${pickups.length === 2 ? 'md:grid-cols-2 print:grid-cols-2' : 'md:grid-cols-3 print:grid-cols-3'} gap-4 print:gap-3`}>
               {pickups.map((pickup, index) => (
-                <div key={pickup.id} className="border border-gray-700 rounded-lg p-4 print:border-gray-300">
+                <div key={pickup.id} className="border border-gray-700 rounded-lg p-4 print:border-gray-300 print:p-3">
                   <h3 className="text-center text-sm font-semibold mb-2 text-gray-300 print:text-black">
                     Pickup {index + 1}: {pickup.pickupName || 'Unnamed'}
                   </h3>
