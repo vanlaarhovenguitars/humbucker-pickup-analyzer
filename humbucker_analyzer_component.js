@@ -294,61 +294,68 @@ function HumbuckerAnalyzer() {
   const presetDatabase = [
     { name: '-- Select a Preset --', manufacturer: '', north: { positive: '', negative: '', poleType: '' }, south: { positive: '', negative: '', poleType: '' } },
     { name: 'Custom/Unknown Pickup', manufacturer: 'Custom', north: { positive: '', negative: '', poleType: '' }, south: { positive: '', negative: '', poleType: '' } },
-    // Seymour Duncan: Green(GND left) / Red-White series / Black(HOT right)
-    { name: 'Seymour Duncan', manufacturer: 'Seymour Duncan', north: { positive: 'Green', negative: 'Red', poleType: 'Slug' }, south: { positive: 'White', negative: 'Black', poleType: 'Screw' } },
-    { name: 'Duncan Designed', manufacturer: 'Duncan Designed', north: { positive: 'Green', negative: 'Red', poleType: 'Slug' }, south: { positive: 'White', negative: 'Black', poleType: 'Screw' } },
-    // DiMarzio: Green(GND left) / Black-White series / Red(HOT right)
-    { name: 'DiMarzio', manufacturer: 'DiMarzio', north: { positive: 'Green', negative: 'Black', poleType: 'Slug' }, south: { positive: 'White', negative: 'Red', poleType: 'Screw' } },
-    // Gibson Aftermarket: Black(GND left) / White-Green series / Red(HOT right)
-    { name: 'Gibson (Aftermarket)', manufacturer: 'Gibson', north: { positive: 'Black', negative: 'White', poleType: 'Slug' }, south: { positive: 'Green', negative: 'Red', poleType: 'Screw' } },
-    { name: 'Gibson (Stock/Vintage)', manufacturer: 'Gibson', north: { positive: 'Black', negative: 'Bare/Shield', poleType: 'Slug' }, south: { positive: 'Bare/Shield', negative: 'Black', poleType: 'Screw' } },
-    // Fender: Black(GND left) / Red-White series / Green(HOT right)
-    { name: 'Fender (Humbucker)', manufacturer: 'Fender', north: { positive: 'Green', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Black', negative: 'White', poleType: 'Screw' } },
-    // Jackson: Same as Fender
-    { name: 'Jackson', manufacturer: 'Jackson', north: { positive: 'Green', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Black', negative: 'White', poleType: 'Screw' } },
-    // Peavey: Green(GND left) / Orange-Red series / Yellow(HOT right)
-    { name: 'Peavey', manufacturer: 'Peavey', north: { positive: 'Yellow', negative: 'Orange', poleType: 'Slug' }, south: { positive: 'Green', negative: 'Red', poleType: 'Screw' } },
-    // Iron Gear: Green(GND left) / Red-White series / Yellow(HOT right)
-    { name: 'Iron Gear', manufacturer: 'Iron Gear', north: { positive: 'Yellow', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
-    // Ibanez: Green(GND left) / Red-White series / Blue(HOT right)
-    { name: 'Ibanez', manufacturer: 'Ibanez', north: { positive: 'Blue', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
-    // Rockfield: Green(GND left) / Red-White series / Black(HOT right)
-    { name: 'Rockfield', manufacturer: 'Rockfield', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
-    // TDM: Green(GND left) / Red-White series / Yellow(HOT right)
-    { name: 'TDM', manufacturer: 'TDM', north: { positive: 'Yellow', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
-    // GFS: Green(GND left) / Red-White series / Black(HOT right)
-    { name: 'GFS', manufacturer: 'GFS', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
-    // Swinehead: Same as DiMarzio
-    { name: 'Swinehead', manufacturer: 'Swinehead', north: { positive: 'Red', negative: 'White', poleType: 'Slug' }, south: { positive: 'Green', negative: 'Black', poleType: 'Screw' } },
+    // Manufacturers in alphabetical order
+    { name: 'Anderson', manufacturer: 'Anderson', north: { positive: 'Red', negative: 'Green', poleType: 'Slug' }, south: { positive: 'White', negative: 'Black', poleType: 'Screw' } },
+    { name: 'Armstrong', manufacturer: 'Armstrong', north: { positive: 'Green', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Black', negative: 'White', poleType: 'Screw' } },
+    { name: 'Artec', manufacturer: 'Artec', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
+    { name: 'Baggs', manufacturer: 'Baggs', north: { positive: 'White', negative: 'Green', poleType: 'Slug' }, south: { positive: 'Red', negative: 'Black', poleType: 'Screw' } },
+    { name: 'Bare Knuckle', manufacturer: 'Bare Knuckle', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
+    { name: 'Bartolini', manufacturer: 'Bartolini', north: { positive: 'Red', negative: 'White', poleType: 'Slug' }, south: { positive: 'Green', negative: 'Black', poleType: 'Screw' } },
+    { name: 'Benedetto', manufacturer: 'Benedetto', north: { positive: 'Red', negative: 'Black', poleType: 'Slug' }, south: { positive: 'White', negative: 'Green', poleType: 'Screw' } },
+    { name: 'Bill Lawrence', manufacturer: 'Bill Lawrence', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
+    { name: 'Carvin', manufacturer: 'Carvin', north: { positive: 'Red', negative: 'White', poleType: 'Slug' }, south: { positive: 'Green', negative: 'Black', poleType: 'Screw' } },
+    { name: 'Dean', manufacturer: 'Dean', north: { positive: 'Black', negative: 'White', poleType: 'Slug' }, south: { positive: 'Red', negative: 'Green', poleType: 'Screw' } },
+    // Seymour Duncan: Black(GND left) / White-Red series / Green(HOT right)
+    { name: 'Seymour Duncan', manufacturer: 'Seymour Duncan', north: { positive: 'Black', negative: 'White', poleType: 'Slug' }, south: { positive: 'Green', negative: 'Red', poleType: 'Screw' } },
+    { name: 'Duncan Designed', manufacturer: 'Duncan Designed', north: { positive: 'Black', negative: 'Green', poleType: 'Slug' }, south: { positive: 'Green', negative: 'Black', poleType: 'Screw' } },
+    // DiMarzio: Red(GND left) / Black-White series / Green(HOT right)
+    { name: 'DiMarzio', manufacturer: 'DiMarzio', north: { positive: 'Red', negative: 'Black', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
+    { name: 'Dimitis', manufacturer: 'Dimitis', north: { positive: 'Green', negative: 'White', poleType: 'Slug' }, south: { positive: 'Red', negative: 'Black', poleType: 'Screw' } },
+    { name: 'DiPinto', manufacturer: 'DiPinto', north: { positive: 'Black', negative: 'White', poleType: 'Slug' }, south: { positive: 'Red', negative: 'Green', poleType: 'Screw' } },
     // EMG: Bare(GND left) / Black-White series / Red(HOT right)
     { name: 'EMG (Passive)', manufacturer: 'EMG', north: { positive: 'Red', negative: 'Black', poleType: 'Slug' }, south: { positive: 'Bare/Shield', negative: 'White', poleType: 'Screw' } },
     // EMG HZ: Green(GND left) / Red-White series / Black(HOT right)
     { name: 'EMG HZ', manufacturer: 'EMG', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
-    // All Active SD: Bare(GND left) / Black-White series / Red(HOT right)
-    { name: 'All Active (Seymour Duncan)', manufacturer: 'Seymour Duncan', north: { positive: 'Red', negative: 'Black', poleType: 'Slug' }, south: { positive: 'Bare/Shield', negative: 'White', poleType: 'Screw' } },
-    // Lawrence: Green(GND left) / Black-White series / Red(HOT right)
-    { name: 'Lawrence', manufacturer: 'Lawrence', north: { positive: 'Red', negative: 'Black', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
-    // Bare Knuckle: Green(GND left) / Red-White series / Black(HOT right)
-    { name: 'Bare Knuckle', manufacturer: 'Bare Knuckle', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
-    // Gotoh: Green(GND left) / Red-White series / Yellow(HOT right)
+    // Fender: Green(GND left) / Red-Black series / White(HOT right)
+    { name: 'Fender (Humbucker)', manufacturer: 'Fender', north: { positive: 'Green', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Black', negative: 'White', poleType: 'Screw' } },
+    { name: 'Fishman', manufacturer: 'Fishman', north: { positive: 'Red', negative: 'White', poleType: 'Slug' }, south: { positive: 'Black', negative: 'Red', poleType: 'Screw' } },
+    { name: 'Fralin', manufacturer: 'Fralin', north: { positive: 'Black', negative: 'White', poleType: 'Slug' }, south: { positive: 'Red', negative: 'Black', poleType: 'Screw' } },
+    { name: 'GFS', manufacturer: 'GFS', north: { positive: 'White', negative: 'Green', poleType: 'Slug' }, south: { positive: 'Red', negative: 'Black', poleType: 'Screw' } },
+    // Gibson Aftermarket: Black(GND left) / White-Green series / Red(HOT right)
+    { name: 'Gibson (Aftermarket)', manufacturer: 'Gibson', north: { positive: 'Black', negative: 'White', poleType: 'Slug' }, south: { positive: 'Green', negative: 'Red', poleType: 'Screw' } },
+    { name: 'Gibson (Stock/Vintage)', manufacturer: 'Gibson', north: { positive: 'Black', negative: 'Bare/Shield', poleType: 'Slug' }, south: { positive: 'Bare/Shield', negative: 'Black', poleType: 'Screw' } },
+    { name: 'Golden Age (4-Conductor)', manufacturer: 'Golden Age', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'Red', poleType: 'Screw' } },
     { name: 'Gotoh', manufacturer: 'Gotoh', north: { positive: 'Yellow', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
-    // Standard pattern for remaining manufacturers: Green(GND left) / Red-White series / Black(HOT right)
-    { name: 'Bill Lawrence', manufacturer: 'Bill Lawrence', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
-    { name: 'Carvin/Kiesel', manufacturer: 'Carvin/Kiesel', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
-    { name: 'Dean USA', manufacturer: 'Dean USA', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
-    { name: 'Fralin', manufacturer: 'Fralin', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
-    { name: 'Golden Age (4-Conductor)', manufacturer: 'Golden Age', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
+    { name: 'Guitar Madness', manufacturer: 'Guitar Madness', north: { positive: 'Green', negative: 'Red', poleType: 'Slug' }, south: { positive: 'White', negative: 'Red', poleType: 'Screw' } },
+    // Ibanez: Blue(GND left) / Red-Green series / White(HOT right)
+    { name: 'Ibanez', manufacturer: 'Ibanez', north: { positive: 'Blue', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
+    // Iron Gear: Yellow(GND left) / Red-Green series / White(HOT right)
+    { name: 'Iron Gear', manufacturer: 'Iron Gear', north: { positive: 'Yellow', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
+    // Jackson: Same as Fender
+    { name: 'Jackson', manufacturer: 'Jackson', north: { positive: 'Green', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Black', negative: 'White', poleType: 'Screw' } },
     { name: 'Joe Barden', manufacturer: 'Joe Barden', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
     { name: 'Kent Armstrong', manufacturer: 'Kent Armstrong', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
-    { name: 'Lollar', manufacturer: 'Lollar Pickups', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
+    // Lawrence: Red(GND left) / Black-Green series / White(HOT right)
+    { name: 'Lawrence', manufacturer: 'Lawrence', north: { positive: 'Red', negative: 'Black', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
+    { name: 'Lollar', manufacturer: 'Lollar Pickups', north: { positive: 'Black', negative: 'White', poleType: 'Slug' }, south: { positive: 'Red', negative: 'Green', poleType: 'Screw' } },
     { name: 'Lundgren', manufacturer: 'Lundgren', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
     { name: 'MAMA Pickups', manufacturer: 'MAMA Pickups', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
     { name: 'Mighty Mite', manufacturer: 'Mighty Mite', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
+    // Peavey: Yellow(GND left) / Orange-Green series / Red(HOT right)
+    { name: 'Peavey', manufacturer: 'Peavey', north: { positive: 'Yellow', negative: 'Orange', poleType: 'Slug' }, south: { positive: 'Green', negative: 'Red', poleType: 'Screw' } },
     { name: 'PRS (Paul Reed Smith)', manufacturer: 'PRS', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
     { name: 'Rio Grande', manufacturer: 'Rio Grande', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
+    { name: 'Rockfield', manufacturer: 'Rockfield', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
     { name: 'Schaller', manufacturer: 'Schaller', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
-    { name: 'Suhr', manufacturer: 'Suhr', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } },
-    { name: 'Tone Rider', manufacturer: 'Tone Rider', north: { positive: 'Black', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'White', poleType: 'Screw' } }
+    { name: 'All Active (Seymour Duncan)', manufacturer: 'Seymour Duncan', north: { positive: 'Red', negative: 'Black', poleType: 'Slug' }, south: { positive: 'Bare/Shield', negative: 'White', poleType: 'Screw' } },
+    { name: 'Sfarzo', manufacturer: 'Sfarzo', north: { positive: 'Red', negative: 'White', poleType: 'Slug' }, south: { positive: 'Green', negative: 'Black', poleType: 'Screw' } },
+    { name: 'Suhr', manufacturer: 'Suhr', north: { positive: 'Black', negative: 'White', poleType: 'Slug' }, south: { positive: 'Red', negative: 'Green', poleType: 'Screw' } },
+    // Swinehead: Black(GND left) / White-Green series / Red(HOT right)
+    { name: 'Swinehead', manufacturer: 'Swinehead', north: { positive: 'Black', negative: 'White', poleType: 'Slug' }, south: { positive: 'Green', negative: 'Red', poleType: 'Screw' } },
+    { name: 'TDM', manufacturer: 'TDM', north: { positive: 'Yellow', negative: 'Red', poleType: 'Slug' }, south: { positive: 'Green', negative: 'Black', poleType: 'Screw' } },
+    { name: 'Tone Rider', manufacturer: 'Tone Rider', north: { positive: 'Black', negative: 'Black', poleType: 'Slug' }, south: { positive: 'White', negative: 'Green', poleType: 'Screw' } },
+    { name: 'TV Jones', manufacturer: 'TV Jones', north: { positive: 'White', negative: 'Green', poleType: 'Slug' }, south: { positive: 'Red', negative: 'Black', poleType: 'Screw' } },
+    { name: 'Wilkinson', manufacturer: 'Wilkinson', north: { positive: 'White', negative: 'Red', poleType: 'Slug' }, south: { positive: 'White', negative: 'Black', poleType: 'Screw' } }
   ];
 
   // Merged preset database (hardcoded + Google Sheets)
@@ -1346,6 +1353,34 @@ function HumbuckerAnalyzer() {
       return;
     }
 
+    // Check for phase mismatch if both phases are entered
+    if (pickupData.northPhase && pickupData.southPhase) {
+      if (pickupData.northPhase !== pickupData.southPhase) {
+        const confirm = window.confirm(
+          'Phase Mismatch Detected!\n\n' +
+          'The North and South coils have opposite phase directions. For a humbucker to work properly, ' +
+          'both coils should have the same phase.\n\n' +
+          `North Coil: ${getPhaseDisplay(pickupData.northPhase)}\n` +
+          `South Coil: ${getPhaseDisplay(pickupData.southPhase)}\n\n` +
+          'Would you like to flip the South coil phase to match the North coil before sharing?'
+        );
+
+        if (confirm) {
+          // Flip the south phase to match north
+          const flippedSouthPhase = flipPhaseValue(pickupData.southPhase);
+          setWizardData({
+            ...wizardData,
+            [`pickup${pickupStep}`]: {
+              ...wizardData[`pickup${pickupStep}`],
+              southPhase: flippedSouthPhase
+            }
+          });
+          alert('South coil phase has been flipped to match the North coil. Please click "Share with Community" again.');
+          return;
+        }
+      }
+    }
+
     // Prepare data for the form
     const formData = {
       manufacturer: pickupData.customBrand || '',
@@ -1356,7 +1391,7 @@ function HumbuckerAnalyzer() {
       southRed: pickupData.customColors.southPositive,
       southBlack: pickupData.customColors.southNegative,
       southPole: pickupData.southPoleType,
-      notes: `North Phase: ${pickupData.northPhase}, South Phase: ${pickupData.southPhase}`
+      notes: `North Phase: ${pickupData.northPhase || 'Not tested'}, South Phase: ${pickupData.southPhase || 'Not tested'}`
     };
 
     // Generate pre-filled form URL
@@ -2394,7 +2429,7 @@ function HumbuckerAnalyzer() {
                   onClick={() => shareCustomPickupWithCommunity(wizardStep)}
                   disabled={(() => {
                     const currentData = wizardData[`pickup${wizardStep}`];
-                    // Only require wire colors
+                    // Only require wire colors (phase testing is optional)
                     const hasAllColors = currentData.customColors.northPositive &&
                                         currentData.customColors.northNegative &&
                                         currentData.customColors.southPositive &&
@@ -2402,7 +2437,7 @@ function HumbuckerAnalyzer() {
                     return !hasAllColors;
                   })()}
                   className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2"
-                  title="Share this custom pickup with the community database (only wire colors required)"
+                  title="Share this custom pickup with the community database (wire colors required, phase testing optional)"
                 >
                   <Upload size={20} />
                   Share with Community
