@@ -2434,11 +2434,11 @@ function HumbuckerAnalyzer() {
 
         {/* Visual Comparison - Side by Side */}
         {pickups.length > 1 && (
-          <div className="bg-gray-800 rounded-lg p-6 mb-6 print:border print:border-gray-300 print:hidden">
-            <h2 className="text-xl font-semibold mb-4 text-blue-300 print:text-black">Visual Comparison</h2>
-            <div className={`grid grid-cols-1 ${pickups.length === 2 ? 'md:grid-cols-2 print:grid-cols-2' : 'md:grid-cols-3 print:grid-cols-3'} gap-4`}>
+          <div className="bg-gray-800 rounded-lg p-6 mb-6 print:border print:border-gray-300 print:bg-white print:p-4 print:mb-4">
+            <h2 className="text-xl font-semibold mb-4 text-blue-300 print:text-black print:text-lg print:mb-3">Visual Comparison</h2>
+            <div className={`grid grid-cols-1 ${pickups.length === 2 ? 'md:grid-cols-2 print:grid-cols-2' : 'md:grid-cols-3 print:grid-cols-3'} gap-4 print:gap-3`}>
               {pickups.map((pickup, index) => (
-                <div key={pickup.id} className="border border-gray-700 rounded-lg p-4 print:border-gray-300">
+                <div key={pickup.id} className="border border-gray-700 rounded-lg p-4 print:border-gray-300 print:p-3">
                   <h3 className="text-center text-sm font-semibold mb-2 text-gray-300 print:text-black">
                     Pickup {index + 1}: {pickup.pickupName || 'Unnamed'}
                   </h3>
