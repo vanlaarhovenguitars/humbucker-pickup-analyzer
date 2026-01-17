@@ -37,6 +37,7 @@ function HumbuckerAnalyzer() {
   const [showSetupWizard, setShowSetupWizard] = useState(true);
   const [wizardStep, setWizardStep] = useState(0); // 0 = method selection, 1 = pickup 1, 2 = pickup 2
   const [phaseTestingMethod, setPhaseTestingMethod] = useState('analog'); // 'analog', 'digital', 'naudio'
+  const [showInstructions, setShowInstructions] = useState(false); // For collapsible instructions
   const [wizardData, setWizardData] = useState({
     pickup1: {
       preset: '',
@@ -1613,7 +1614,10 @@ function HumbuckerAnalyzer() {
                 {/* Next Button */}
                 <div className="flex justify-end pt-4">
                   <button
-                    onClick={() => setWizardStep(1)}
+                    onClick={() => {
+                      setWizardStep(1);
+                      setShowInstructions(false);
+                    }}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition"
                   >
                     Next: Select Pickups →
@@ -1700,10 +1704,19 @@ function HumbuckerAnalyzer() {
                     const instructions = getPhaseInstructions(phaseTestingMethod);
                     return (
                       <div className="bg-gray-700 rounded-lg p-4 border-2 border-yellow-500">
-                        <h3 className="font-bold text-yellow-400 mb-3 flex items-center gap-2">
-                          <span className="text-xl">⚡</span> {instructions.title}
-                        </h3>
-                        <div className="space-y-3 text-sm text-gray-200">
+                        <button
+                          onClick={() => setShowInstructions(!showInstructions)}
+                          className="w-full flex items-center justify-between text-left hover:bg-gray-600 rounded p-2 -m-2 transition"
+                        >
+                          <h3 className="font-bold text-yellow-400 flex items-center gap-2">
+                            <span className="text-xl">⚡</span> {instructions.title}
+                          </h3>
+                          <span className="text-yellow-400 text-xl">
+                            {showInstructions ? '−' : '+'}
+                          </span>
+                        </button>
+                        {showInstructions && (
+                        <div className="space-y-3 text-sm text-gray-200 mt-3">
                           {/* Device Setup Info */}
                           <div className="bg-gray-600 rounded p-2">
                             {instructions.deviceSetup.map((line, idx) => (
@@ -1769,10 +1782,11 @@ function HumbuckerAnalyzer() {
                             ))}
                           </div>
                         </div>
+                        )}
                       </div>
                     );
                   })()}
-                  
+
                   {/* North Coil */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
@@ -2002,10 +2016,19 @@ function HumbuckerAnalyzer() {
 
                 return (
                   <div className="bg-gray-700 rounded-lg p-4 border-2 border-yellow-500">
-                    <h3 className="font-bold text-yellow-400 mb-3 flex items-center gap-2">
-                      <span className="text-xl">⚡</span> {instructions.title}
-                    </h3>
-                    <div className="space-y-3 text-sm text-gray-200">
+                    <button
+                      onClick={() => setShowInstructions(!showInstructions)}
+                      className="w-full flex items-center justify-between text-left hover:bg-gray-600 rounded p-2 -m-2 transition"
+                    >
+                      <h3 className="font-bold text-yellow-400 flex items-center gap-2">
+                        <span className="text-xl">⚡</span> {instructions.title}
+                      </h3>
+                      <span className="text-yellow-400 text-xl">
+                        {showInstructions ? '−' : '+'}
+                      </span>
+                    </button>
+                    {showInstructions && (
+                    <div className="space-y-3 text-sm text-gray-200 mt-3">
                       {/* Device Setup Info */}
                       <div className="bg-gray-600 rounded p-2">
                         {instructions.deviceSetup.map((line, idx) => (
@@ -2083,6 +2106,7 @@ function HumbuckerAnalyzer() {
                         ))}
                       </div>
                     </div>
+                    )}
                   </div>
                 );
               })()}
@@ -2125,7 +2149,10 @@ function HumbuckerAnalyzer() {
             <div className="flex gap-4 mt-8">
               {wizardStep === 2 && (
                 <button
-                  onClick={() => setWizardStep(1)}
+                  onClick={() => {
+                    setWizardStep(1);
+                    setShowInstructions(false);
+                  }}
                   className="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition"
                 >
                   ← Back
@@ -2151,6 +2178,7 @@ function HumbuckerAnalyzer() {
                   
                   if (wizardStep === 1) {
                     setWizardStep(2);
+                    setShowInstructions(false);
                   } else if (wizardStep === 2) {
                     completeWizard();
                   }
