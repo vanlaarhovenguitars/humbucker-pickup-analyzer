@@ -35,7 +35,7 @@ function HumbuckerAnalyzer() {
   
   // Setup wizard
   const [showSetupWizard, setShowSetupWizard] = useState(true);
-  const [wizardStep, setWizardStep] = useState(0); // 0 = method selection, 1 = pickup 1, 2 = pickup 2
+  const [wizardStep, setWizardStep] = useState(0); // 0 = method selection, 1 = pickup 1, 2 = pickup 2, 3 = pickup 3
   const [phaseTestingMethod, setPhaseTestingMethod] = useState('analog'); // 'analog', 'digital', 'naudio'
   const [showInstructions, setShowInstructions] = useState(false); // For collapsible instructions
   const [wizardData, setWizardData] = useState({
@@ -58,6 +58,24 @@ function HumbuckerAnalyzer() {
       southPoleType: 'Screw'
     },
     pickup2: {
+      preset: '',
+      isTwoConductor: false,
+      phase: '',
+      isCustom: false,
+      customBrand: '',
+      customName: '',
+      customColors: {
+        northPositive: '',
+        northNegative: '',
+        southPositive: '',
+        southNegative: ''
+      },
+      northPhase: '',
+      southPhase: '',
+      northPoleType: 'Slug',
+      southPoleType: 'Screw'
+    },
+    pickup3: {
       preset: '',
       isTwoConductor: false,
       phase: '',
@@ -1235,18 +1253,22 @@ function HumbuckerAnalyzer() {
     // Pickup 1
     const pickup1 = createPickup(wizardData.pickup1, 1);
     if (pickup1) newPickups.push(pickup1);
-    
+
     // Pickup 2
     const pickup2 = createPickup(wizardData.pickup2, 2);
     if (pickup2) newPickups.push(pickup2);
-    
+
+    // Pickup 3 (optional)
+    const pickup3 = createPickup(wizardData.pickup3, 3);
+    if (pickup3) newPickups.push(pickup3);
+
     if (newPickups.length > 0) {
       setPickups(newPickups);
     }
     setShowSetupWizard(false);
-    
+
     // Check for phase conflicts after wizard completes
-    if (newPickups.length === 2) {
+    if (newPickups.length >= 2) {
       // Get phase for pickup 2 (works for both preset and custom)
       const pickup2Phase = newPickups[1].coils.north.phase; // Use the actual phase from the created pickup
       const pickup2Is2Conductor = newPickups[1].isTwoConductor;
@@ -2194,10 +2216,10 @@ function HumbuckerAnalyzer() {
             {/* Navigation Buttons - Only show for pickup selection steps */}
             {wizardStep > 0 && (
             <div className="flex gap-4 mt-8">
-              {wizardStep === 2 && (
+              {(wizardStep === 2 || wizardStep === 3) && (
                 <button
                   onClick={() => {
-                    setWizardStep(1);
+                    setWizardStep(wizardStep - 1);
                     setShowInstructions(false);
                   }}
                   className="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition"
@@ -2205,43 +2227,150 @@ function HumbuckerAnalyzer() {
                   ← Back
                 </button>
               )}
-              <button
-                onClick={() => {
-                  const currentData = wizardData[`pickup${wizardStep}`];
-                  const isValid = currentData.preset && (
-                    !currentData.isCustom 
-                      ? currentData.phase  // Preset needs phase
-                      : (currentData.northPhase && currentData.southPhase)  // Custom needs both phases
-                  );
-                  
-                  if (!isValid) return;
-                  
-                  // Check for phase mismatch in custom pickups
-                  if (currentData.isCustom && currentData.northPhase !== currentData.southPhase) {
-                    setCustomPhaseMismatchData({ pickupStep: wizardStep });
-                    setShowCustomPhaseMismatch(true);
-                    return;
-                  }
-                  
-                  if (wizardStep === 1) {
+
+              {/* Step 1: Next button */}
+              {wizardStep === 1 && (
+                <button
+                  onClick={() => {
+                    const currentData = wizardData[`pickup${wizardStep}`];
+                    const isValid = currentData.preset && (
+                      !currentData.isCustom
+                        ? currentData.phase  // Preset needs phase
+                        : (currentData.northPhase && currentData.southPhase)  // Custom needs both phases
+                    );
+
+                    if (!isValid) return;
+
+                    // Check for phase mismatch in custom pickups
+                    if (currentData.isCustom && currentData.northPhase !== currentData.southPhase) {
+                      setCustomPhaseMismatchData({ pickupStep: wizardStep });
+                      setShowCustomPhaseMismatch(true);
+                      return;
+                    }
+
                     setWizardStep(2);
                     setShowInstructions(false);
-                  } else if (wizardStep === 2) {
+                  }}
+                  disabled={(() => {
+                    const currentData = wizardData[`pickup${wizardStep}`];
+                    if (!currentData.preset) return true;
+                    if (currentData.isCustom) {
+                      return !currentData.northPhase || !currentData.southPhase;
+                    }
+                    return !currentData.phase;
+                  })()}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-semibold transition"
+                >
+                  Next →
+                </button>
+              )}
+
+              {/* Step 2: Add 3rd Pickup OR Complete Setup buttons */}
+              {wizardStep === 2 && (
+                <>
+                  <button
+                    onClick={() => {
+                      const currentData = wizardData[`pickup${wizardStep}`];
+                      const isValid = currentData.preset && (
+                        !currentData.isCustom
+                          ? currentData.phase  // Preset needs phase
+                          : (currentData.northPhase && currentData.southPhase)  // Custom needs both phases
+                      );
+
+                      if (!isValid) return;
+
+                      // Check for phase mismatch in custom pickups
+                      if (currentData.isCustom && currentData.northPhase !== currentData.southPhase) {
+                        setCustomPhaseMismatchData({ pickupStep: wizardStep });
+                        setShowCustomPhaseMismatch(true);
+                        return;
+                      }
+
+                      setWizardStep(3);
+                      setShowInstructions(false);
+                    }}
+                    disabled={(() => {
+                      const currentData = wizardData[`pickup${wizardStep}`];
+                      if (!currentData.preset) return true;
+                      if (currentData.isCustom) {
+                        return !currentData.northPhase || !currentData.southPhase;
+                      }
+                      return !currentData.phase;
+                    })()}
+                    className="flex-1 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-semibold transition"
+                  >
+                    Add 3rd Pickup →
+                  </button>
+                  <button
+                    onClick={() => {
+                      const currentData = wizardData[`pickup${wizardStep}`];
+                      const isValid = currentData.preset && (
+                        !currentData.isCustom
+                          ? currentData.phase  // Preset needs phase
+                          : (currentData.northPhase && currentData.southPhase)  // Custom needs both phases
+                      );
+
+                      if (!isValid) return;
+
+                      // Check for phase mismatch in custom pickups
+                      if (currentData.isCustom && currentData.northPhase !== currentData.southPhase) {
+                        setCustomPhaseMismatchData({ pickupStep: wizardStep });
+                        setShowCustomPhaseMismatch(true);
+                        return;
+                      }
+
+                      completeWizard();
+                    }}
+                    disabled={(() => {
+                      const currentData = wizardData[`pickup${wizardStep}`];
+                      if (!currentData.preset) return true;
+                      if (currentData.isCustom) {
+                        return !currentData.northPhase || !currentData.southPhase;
+                      }
+                      return !currentData.phase;
+                    })()}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-semibold transition"
+                  >
+                    Complete Setup
+                  </button>
+                </>
+              )}
+
+              {/* Step 3: Complete Setup button */}
+              {wizardStep === 3 && (
+                <button
+                  onClick={() => {
+                    const currentData = wizardData[`pickup${wizardStep}`];
+                    const isValid = currentData.preset && (
+                      !currentData.isCustom
+                        ? currentData.phase  // Preset needs phase
+                        : (currentData.northPhase && currentData.southPhase)  // Custom needs both phases
+                    );
+
+                    if (!isValid) return;
+
+                    // Check for phase mismatch in custom pickups
+                    if (currentData.isCustom && currentData.northPhase !== currentData.southPhase) {
+                      setCustomPhaseMismatchData({ pickupStep: wizardStep });
+                      setShowCustomPhaseMismatch(true);
+                      return;
+                    }
+
                     completeWizard();
-                  }
-                }}
-                disabled={(() => {
-                  const currentData = wizardData[`pickup${wizardStep}`];
-                  if (!currentData.preset) return true;
-                  if (currentData.isCustom) {
-                    return !currentData.northPhase || !currentData.southPhase;
-                  }
-                  return !currentData.phase;
-                })()}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-semibold transition"
-              >
-                {wizardStep === 1 ? 'Next →' : 'Complete Setup'}
-              </button>
+                  }}
+                  disabled={(() => {
+                    const currentData = wizardData[`pickup${wizardStep}`];
+                    if (!currentData.preset) return true;
+                    if (currentData.isCustom) {
+                      return !currentData.northPhase || !currentData.southPhase;
+                    }
+                    return !currentData.phase;
+                  })()}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-semibold transition"
+                >
+                  Complete Setup
+                </button>
+              )}
 
               {/* Share with Community button - only show for custom pickups */}
               {CONFIG?.ENABLE_SHARE_BUTTON && wizardData[`pickup${wizardStep}`]?.isCustom && (
