@@ -1617,15 +1617,15 @@ function HumbuckerAnalyzer() {
 
       {/* Setup Wizard Modal */}
       {showSetupWizard && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-start md:items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-gray-800 rounded-lg p-6 md:p-8 max-w-3xl w-full my-2 md:my-8">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-3xl font-bold text-blue-400">
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-start md:items-center justify-center z-50 p-2 md:p-4 overflow-y-auto">
+          <div className="bg-gray-800 rounded-lg p-4 md:p-8 max-w-3xl w-full my-2 md:my-8">
+            <div className="flex items-center justify-between mb-4 md:mb-6">
+              <h2 className="text-xl md:text-3xl font-bold text-blue-400">
                 {wizardStep === 0 ? 'Select Your Phase Testing Method' : `Setup Pickup ${wizardStep}`}
               </h2>
               <button
                 onClick={() => setShowSetupWizard(false)}
-                className="text-gray-400 hover:text-white transition-colors text-2xl font-bold px-3 py-1"
+                className="text-gray-400 hover:text-white transition-colors text-xl md:text-2xl font-bold px-2 md:px-3 py-1"
                 title="Close wizard and use manual setup"
               >
                 ✕
@@ -1634,15 +1634,15 @@ function HumbuckerAnalyzer() {
 
             {/* Step 0: Phase Testing Method Selection */}
             {wizardStep === 0 && (
-              <div className="space-y-6">
-                <p className="text-gray-300 mb-6">
+              <div className="space-y-3 md:space-y-6">
+                <p className="text-gray-300 mb-3 md:mb-6 text-sm md:text-base">
                   Choose the device you'll use to test pickup phase. This will customize the instructions throughout the setup wizard.
                 </p>
 
                 {/* Analog Meter Option */}
                 <div
                   onClick={() => setPhaseTestingMethod('analog')}
-                  className={`cursor-pointer rounded-lg p-6 border-2 transition ${
+                  className={`cursor-pointer rounded-lg p-3 md:p-6 border-2 transition ${
                     phaseTestingMethod === 'analog'
                       ? 'border-blue-500 bg-blue-900'
                       : 'border-gray-600 bg-gray-700 hover:border-gray-500'
@@ -1656,8 +1656,8 @@ function HumbuckerAnalyzer() {
                       className="mt-1"
                     />
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold text-white mb-2">Analog Meter</h3>
-                      <p className="text-gray-300 mb-3">
+                      <h3 className="text-base md:text-xl font-bold text-white mb-1 md:mb-2">Analog Meter</h3>
+                      <p className="text-gray-300 mb-2 md:mb-3 text-sm md:text-base">
                         Traditional analog meter with moving needle. Place screwdriver on poles, rapidly pull off,
                         and watch which direction the needle swings.
                       </p>
@@ -1671,7 +1671,7 @@ function HumbuckerAnalyzer() {
                 {/* Digital Multimeter Option */}
                 <div
                   onClick={() => setPhaseTestingMethod('digital')}
-                  className={`cursor-pointer rounded-lg p-6 border-2 transition ${
+                  className={`cursor-pointer rounded-lg p-3 md:p-6 border-2 transition ${
                     phaseTestingMethod === 'digital'
                       ? 'border-blue-500 bg-blue-900'
                       : 'border-gray-600 bg-gray-700 hover:border-gray-500'
@@ -1685,8 +1685,8 @@ function HumbuckerAnalyzer() {
                       className="mt-1"
                     />
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold text-white mb-2">Digital Multimeter</h3>
-                      <p className="text-gray-300 mb-3">
+                      <h3 className="text-base md:text-xl font-bold text-white mb-1 md:mb-2">Digital Multimeter</h3>
+                      <p className="text-gray-300 mb-2 md:mb-3 text-sm md:text-base">
                         Digital meter showing positive/negative voltage. Pull screwdriver off poles and
                         watch if voltage goes up (+) or down (-).
                       </p>
@@ -1700,7 +1700,7 @@ function HumbuckerAnalyzer() {
                 {/* N-Audio Phase Checker Option */}
                 <div
                   onClick={() => setPhaseTestingMethod('naudio')}
-                  className={`cursor-pointer rounded-lg p-6 border-2 transition ${
+                  className={`cursor-pointer rounded-lg p-3 md:p-6 border-2 transition ${
                     phaseTestingMethod === 'naudio'
                       ? 'border-blue-500 bg-blue-900'
                       : 'border-gray-600 bg-gray-700 hover:border-gray-500'
@@ -1714,8 +1714,8 @@ function HumbuckerAnalyzer() {
                       className="mt-1"
                     />
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold text-white mb-2">N-Audio Phase Checker</h3>
-                      <p className="text-gray-300 mb-3">
+                      <h3 className="text-base md:text-xl font-bold text-white mb-1 md:mb-2">N-Audio Phase Checker</h3>
+                      <p className="text-gray-300 mb-2 md:mb-3 text-sm md:text-base">
                         Professional LED-based phase testing device. Connect pickup coils and read LED color.
                       </p>
                       <a
@@ -1751,7 +1751,7 @@ function HumbuckerAnalyzer() {
 
             {/* Preset Selection */}
             {wizardStep > 0 && (
-            <div className="space-y-6">
+            <div className="space-y-3 md:space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Select Manufacturer Preset
@@ -1826,20 +1826,20 @@ function HumbuckerAnalyzer() {
                   {(() => {
                     const instructions = getPhaseInstructions(phaseTestingMethod);
                     return (
-                      <div className="bg-gray-700 rounded-lg p-4 border-2 border-yellow-500">
+                      <div className="bg-gray-700 rounded-lg p-3 md:p-4 border-2 border-yellow-500">
                         <button
                           onClick={() => setShowInstructions(!showInstructions)}
                           className="w-full flex items-center justify-between text-left hover:bg-gray-600 rounded p-2 -m-2 transition"
                         >
-                          <h3 className="font-bold text-yellow-400">
+                          <h3 className="text-sm md:text-base font-bold text-yellow-400">
                             {instructions.title}
                           </h3>
-                          <span className="text-yellow-400 text-xl">
+                          <span className="text-yellow-400 text-lg md:text-xl">
                             {showInstructions ? '−' : '+'}
                           </span>
                         </button>
                         {showInstructions && (
-                        <div className="space-y-3 text-sm text-gray-200 mt-3">
+                        <div className="space-y-2 md:space-y-3 text-xs md:text-sm text-gray-200 mt-2 md:mt-3">
                           {/* Device Setup Info */}
                           <div className="bg-gray-600 rounded p-2">
                             {instructions.deviceSetup.map((line, idx) => (
@@ -2166,20 +2166,20 @@ function HumbuckerAnalyzer() {
                 const instructions = getPhaseInstructions(phaseTestingMethod);
 
                 return (
-                  <div className="bg-gray-700 rounded-lg p-4 border-2 border-yellow-500">
+                  <div className="bg-gray-700 rounded-lg p-3 md:p-4 border-2 border-yellow-500">
                     <button
                       onClick={() => setShowInstructions(!showInstructions)}
                       className="w-full flex items-center justify-between text-left hover:bg-gray-600 rounded p-2 -m-2 transition"
                     >
-                      <h3 className="font-bold text-yellow-400">
+                      <h3 className="text-sm md:text-base font-bold text-yellow-400">
                         {instructions.title}
                       </h3>
-                      <span className="text-yellow-400 text-xl">
+                      <span className="text-yellow-400 text-lg md:text-xl">
                         {showInstructions ? '−' : '+'}
                       </span>
                     </button>
                     {showInstructions && (
-                    <div className="space-y-3 text-sm text-gray-200 mt-3">
+                    <div className="space-y-2 md:space-y-3 text-xs md:text-sm text-gray-200 mt-2 md:mt-3">
                       {/* Device Setup Info */}
                       <div className="bg-gray-600 rounded p-2">
                         {instructions.deviceSetup.map((line, idx) => (
