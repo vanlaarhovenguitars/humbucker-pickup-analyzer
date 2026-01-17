@@ -2658,7 +2658,7 @@ function HumbuckerAnalyzer() {
         )}
 
         {/* Summary Section - Below Visual Comparison */}
-        {pickups.length === 2 && pickups[0].manufacturer && pickups[1].manufacturer && !showSetupWizard && (
+        {pickups.length >= 2 && pickups[0].manufacturer && pickups[1].manufacturer && !showSetupWizard && (
           <div className="bg-gray-800 rounded-lg p-6 mb-8 print:border print:border-gray-300 print:bg-white print:break-inside-avoid print:p-4">
             <div className="flex items-center justify-between mb-6 print:block print:mb-4">
               <h2 className="text-2xl font-bold text-blue-400 print:text-black print:text-xl print:mb-3">Pickup Summary</h2>
@@ -2671,7 +2671,7 @@ function HumbuckerAnalyzer() {
                 Print
               </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-6 print:gap-4">
+            <div className={`grid grid-cols-1 ${pickups.length === 3 ? 'md:grid-cols-3 print:grid-cols-3' : 'md:grid-cols-2 print:grid-cols-2'} gap-6 print:gap-4`}>
               {pickups.map((pickup, idx) => (
                 <div key={pickup.id} className="bg-gray-700 rounded-lg p-6 print:border print:border-gray-300 print:bg-white print:break-inside-avoid print:p-4">
                   <h3 className="text-xl font-bold text-blue-300 mb-4 print:text-black">
