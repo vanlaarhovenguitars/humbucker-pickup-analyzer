@@ -736,6 +736,7 @@ function HumbuckerAnalyzer() {
   };
 
   const reset = () => {
+    // Clear pickups
     setPickups([{
       id: 1,
       pickupName: '',
@@ -760,6 +761,55 @@ function HumbuckerAnalyzer() {
       isTwoConductor: false,
       isReversed: false
     }]);
+
+    // Reset wizard data
+    setWizardData({
+      pickup1: {
+        preset: '',
+        isTwoConductor: false,
+        phase: '',
+        isCustom: false,
+        customBrand: '',
+        customName: '',
+        customColors: { northPositive: '', northNegative: '', southPositive: '', southNegative: '' },
+        northPhase: '',
+        southPhase: '',
+        northPoleType: 'Slug',
+        southPoleType: 'Screw'
+      },
+      pickup2: {
+        preset: '',
+        isTwoConductor: false,
+        phase: '',
+        isCustom: false,
+        customBrand: '',
+        customName: '',
+        customColors: { northPositive: '', northNegative: '', southPositive: '', southNegative: '' },
+        northPhase: '',
+        southPhase: '',
+        northPoleType: 'Slug',
+        southPoleType: 'Screw'
+      },
+      pickup3: {
+        preset: '',
+        isTwoConductor: false,
+        phase: '',
+        isCustom: false,
+        customBrand: '',
+        customName: '',
+        customColors: { northPositive: '', northNegative: '', southPositive: '', southNegative: '' },
+        northPhase: '',
+        southPhase: '',
+        northPoleType: 'Slug',
+        southPoleType: 'Screw'
+      }
+    });
+
+    // Reset wizard state and reopen wizard
+    setWizardStep(0);
+    setPhaseTestingMethod('analog');
+    setShowInstructions(false);
+    setShowSetupWizard(true);
   };
 
   const ColorSelect = ({ value, onChange, label }) => (
