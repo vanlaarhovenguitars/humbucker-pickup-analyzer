@@ -1368,14 +1368,21 @@ function HumbuckerAnalyzer() {
         if (confirm) {
           // Flip the south phase to match north
           const flippedSouthPhase = flipPhaseValue(pickupData.southPhase);
+          // Also swap the south coil wire colors when flipping phase
+          const flippedColors = {
+            ...wizardData[`pickup${pickupStep}`].customColors,
+            southPositive: wizardData[`pickup${pickupStep}`].customColors.southNegative,
+            southNegative: wizardData[`pickup${pickupStep}`].customColors.southPositive
+          };
           setWizardData({
             ...wizardData,
             [`pickup${pickupStep}`]: {
               ...wizardData[`pickup${pickupStep}`],
-              southPhase: flippedSouthPhase
+              southPhase: flippedSouthPhase,
+              customColors: flippedColors
             }
           });
-          alert('South coil phase has been flipped to match the North coil. Please click "Share with Community" again.');
+          alert('South coil phase and wires have been flipped to match the North coil. Please click "Share with Community" again.');
           return;
         }
       }
