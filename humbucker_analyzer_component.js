@@ -187,6 +187,87 @@ function HumbuckerAnalyzer() {
     return instructions[method] || instructions.analog;
   };
 
+  // Normalize phase value to "negative" or "positive" for cross-method compatibility
+  const normalizePhase = (phaseValue) => {
+    if (!phaseValue) return null;
+
+    const valueStr = String(phaseValue).toLowerCase();
+
+    // All "left/down/red" values are negative phase
+    if (
+      valueStr.includes('left') ||
+      valueStr.includes('down') ||
+      valueStr.includes('red') ||
+      valueStr.includes('↓') ||
+      valueStr.includes('←') ||
+      valueStr.includes('🔴') ||
+      valueStr.includes('negative')
+    ) {
+      return 'negative';
+    }
+    // All "right/up/green" values are positive phase
+    if (
+      valueStr.includes('right') ||
+      valueStr.includes('up') ||
+      valueStr.includes('green') ||
+      valueStr.includes('↑') ||
+      valueStr.includes('→') ||
+      valueStr.includes('🟢') ||
+      valueStr.includes('positive')
+    ) {
+      return 'positive';
+    }
+    return null;
+  };
+
+  // Get display-friendly phase label based on testing method
+  const getPhaseDisplay = (phaseValue) => {
+    if (!phaseValue) return '';
+
+    const instructions = getPhaseInstructions(phaseTestingMethod);
+
+    // First try direct match with current method
+    const directMatch = instructions.phaseOptions.find(opt => opt.value === phaseValue);
+    if (directMatch) {
+      return directMatch.display;
+    }
+
+    // If no direct match, normalize and convert to current method
+    const normalized = normalizePhase(phaseValue);
+
+    if (normalized === 'negative') {
+      // Return the first option (which is always negative/left/down/red)
+      return instructions.phaseOptions[0].display;
+    } else if (normalized === 'positive') {
+      // Return the second option (which is always positive/right/up/green)
+      return instructions.phaseOptions[1].display;
+    }
+
+    // Fallback: return original value
+    return phaseValue;
+  };
+
+  // Flip phase value to opposite (for phase reversal)
+  const flipPhaseValue = (currentPhase) => {
+    const instructions = getPhaseInstructions(phaseTestingMethod);
+    const normalized = normalizePhase(currentPhase);
+
+    if (normalized === 'negative') {
+      // Flip to positive (second option)
+      return instructions.phaseOptions[1].value;
+    } else if (normalized === 'positive') {
+      // Flip to negative (first option)
+      return instructions.phaseOptions[0].value;
+    }
+
+    // Fallback: return analog values
+    if (currentPhase && currentPhase.includes('Left')) {
+      return '→ Right';
+    } else {
+      return '← Left';
+    }
+  };
+
   // Preset database based on official pickup color code charts
   // IMPORTANT: North start (positive/left) = HOT output, South start (positive/left) = GROUND
   // Series connection: North finish (negative/right) connects to South finish (negative/right)
@@ -575,12 +656,8 @@ function HumbuckerAnalyzer() {
       updated[pickupIndex].coils[coil].positive.color = updated[pickupIndex].coils[coil].negative.color;
       updated[pickupIndex].coils[coil].negative.color = temp;
       
-      // Reverse the phase direction
-      if (updated[pickupIndex].coils[coil].phase.includes('Left')) {
-        updated[pickupIndex].coils[coil].phase = '→ Right';
-      } else {
-        updated[pickupIndex].coils[coil].phase = '← Left';
-      }
+      // Reverse the phase direction using current testing method
+      updated[pickupIndex].coils[coil].phase = flipPhaseValue(updated[pickupIndex].coils[coil].phase);
     } else if (phaseWarningData.type === 'one-2-conductor') {
       // Reverse the 4-conductor pickup (whichever one that is)
       const pickupToReverse = phaseWarningData.whichIs2Conductor === 'current' 
@@ -592,22 +669,14 @@ function HumbuckerAnalyzer() {
       updated[pickupToReverse].coils.north.positive.color = updated[pickupToReverse].coils.north.negative.color;
       updated[pickupToReverse].coils.north.negative.color = temp;
       
-      if (updated[pickupToReverse].coils.north.phase.includes('Left')) {
-        updated[pickupToReverse].coils.north.phase = '→ Right';
-      } else {
-        updated[pickupToReverse].coils.north.phase = '← Left';
-      }
+      updated[pickupToReverse].coils.north.phase = flipPhaseValue(updated[pickupToReverse].coils.north.phase);
       
       // Reverse South coil
       temp = updated[pickupToReverse].coils.south.positive.color;
       updated[pickupToReverse].coils.south.positive.color = updated[pickupToReverse].coils.south.negative.color;
       updated[pickupToReverse].coils.south.negative.color = temp;
       
-      if (updated[pickupToReverse].coils.south.phase.includes('Left')) {
-        updated[pickupToReverse].coils.south.phase = '→ Right';
-      } else {
-        updated[pickupToReverse].coils.south.phase = '← Left';
-      }
+      updated[pickupToReverse].coils.south.phase = flipPhaseValue(updated[pickupToReverse].coils.south.phase);
     } else if (phaseWarningData.type === 'both-4-conductor' || 
                phaseWarningData.type === 'cross-pickup' || 
                phaseWarningData.type === 'cross-pickup-2conductor-current') {
@@ -618,23 +687,15 @@ function HumbuckerAnalyzer() {
       let temp = updated[pickupIndex].coils.north.positive.color;
       updated[pickupIndex].coils.north.positive.color = updated[pickupIndex].coils.north.negative.color;
       updated[pickupIndex].coils.north.negative.color = temp;
-      
-      if (updated[pickupIndex].coils.north.phase.includes('Left')) {
-        updated[pickupIndex].coils.north.phase = '→ Right';
-      } else {
-        updated[pickupIndex].coils.north.phase = '← Left';
-      }
-      
+
+      updated[pickupIndex].coils.north.phase = flipPhaseValue(updated[pickupIndex].coils.north.phase);
+
       // Reverse South coil
       temp = updated[pickupIndex].coils.south.positive.color;
       updated[pickupIndex].coils.south.positive.color = updated[pickupIndex].coils.south.negative.color;
       updated[pickupIndex].coils.south.negative.color = temp;
-      
-      if (updated[pickupIndex].coils.south.phase.includes('Left')) {
-        updated[pickupIndex].coils.south.phase = '→ Right';
-      } else {
-        updated[pickupIndex].coils.south.phase = '← Left';
-      }
+
+      updated[pickupIndex].coils.south.phase = flipPhaseValue(updated[pickupIndex].coils.south.phase);
       
       // Toggle isReversed flag
       updated[pickupIndex].isReversed = !updated[pickupIndex].isReversed;
@@ -808,7 +869,7 @@ function HumbuckerAnalyzer() {
           </text>
         )}
         {/* Phase arrow for North coil - LEFT */}
-        {pickup.coils.north.phase && pickup.coils.north.phase.includes('Left') && (
+        {pickup.coils.north.phase && normalizePhase(pickup.coils.north.phase) === 'negative' && (
           <g>
             <path d="M 25 210 L 15 220 L 25 230" stroke="#fbbf24" strokeWidth="3" fill="none" className="print:stroke-black"/>
             <text x="10" y="207" fontSize="10" fill="#fbbf24" fontWeight="bold" className="print:fill-black">←</text>
@@ -831,7 +892,7 @@ function HumbuckerAnalyzer() {
           </text>
         )}
         {/* Phase arrow for North coil - RIGHT */}
-        {pickup.coils.north.phase && pickup.coils.north.phase.includes('Right') && (
+        {pickup.coils.north.phase && normalizePhase(pickup.coils.north.phase) === 'positive' && (
           <g>
             <path d="M 675 210 L 685 220 L 675 230" stroke="#fbbf24" strokeWidth="3" fill="none" className="print:stroke-black"/>
             <text x="680" y="207" fontSize="10" fill="#fbbf24" fontWeight="bold" className="print:fill-black">→</text>
@@ -935,7 +996,7 @@ function HumbuckerAnalyzer() {
           })()
         )}
         {/* Phase arrow for South coil - LEFT */}
-        {pickup.coils.south.phase && pickup.coils.south.phase.includes('Left') && (
+        {pickup.coils.south.phase && normalizePhase(pickup.coils.south.phase) === 'negative' && (
           <g>
             <path d="M 25 370 L 15 380 L 25 390" stroke="#fbbf24" strokeWidth="3" fill="none" className="print:stroke-black"/>
             <text x="10" y="367" fontSize="10" fill="#fbbf24" fontWeight="bold" className="print:fill-black">←</text>
@@ -958,7 +1019,7 @@ function HumbuckerAnalyzer() {
           </text>
         )}
         {/* Phase arrow for South coil - RIGHT */}
-        {pickup.coils.south.phase && pickup.coils.south.phase.includes('Right') && (
+        {pickup.coils.south.phase && normalizePhase(pickup.coils.south.phase) === 'positive' && (
           <g>
             <path d="M 675 370 L 685 380 L 675 390" stroke="#fbbf24" strokeWidth="3" fill="none" className="print:stroke-black"/>
             <text x="680" y="367" fontSize="10" fill="#fbbf24" fontWeight="bold" className="print:fill-black">→</text>
@@ -2055,7 +2116,8 @@ function HumbuckerAnalyzer() {
             </div>
             )}
 
-            {/* Navigation Buttons */}
+            {/* Navigation Buttons - Only show for pickup selection steps */}
+            {wizardStep > 0 && (
             <div className="flex gap-4 mt-8">
               {wizardStep === 2 && (
                 <button
@@ -2342,7 +2404,7 @@ function HumbuckerAnalyzer() {
         </div>
 
         {/* Looth Tool Advertisement */}
-        <div className="bg-gradient-to-r from-blue-900 to-purple-900 rounded-lg p-6 mb-6 border-2 border-blue-500 print:border print:border-gray-300 print:bg-white">
+        <div className="bg-gradient-to-r from-blue-900 to-purple-900 rounded-lg p-6 mb-6 border-2 border-blue-500 print:hidden">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex-1 min-w-[250px]">
               <h2 className="text-2xl font-bold text-blue-300 mb-2 print:text-black">
@@ -2374,7 +2436,7 @@ function HumbuckerAnalyzer() {
         {pickups.length > 1 && (
           <div className="bg-gray-800 rounded-lg p-6 mb-6 print:border print:border-gray-300">
             <h2 className="text-xl font-semibold mb-4 text-blue-300 print:text-black">Visual Comparison</h2>
-            <div className={`grid grid-cols-1 ${pickups.length === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-4`}>
+            <div className={`grid grid-cols-1 ${pickups.length === 2 ? 'md:grid-cols-2 print:grid-cols-2' : 'md:grid-cols-3 print:grid-cols-3'} gap-4`}>
               {pickups.map((pickup, index) => (
                 <div key={pickup.id} className="border border-gray-700 rounded-lg p-4 print:border-gray-300">
                   <h3 className="text-center text-sm font-semibold mb-2 text-gray-300 print:text-black">
@@ -2390,8 +2452,18 @@ function HumbuckerAnalyzer() {
         {/* Summary Section - Below Visual Comparison */}
         {pickups.length === 2 && pickups[0].manufacturer && pickups[1].manufacturer && !showSetupWizard && (
           <div className="bg-gray-800 rounded-lg p-6 mb-8 print:border print:border-gray-300 print:bg-white">
-            <h2 className="text-2xl font-bold text-blue-400 mb-6 print:text-black">Pickup Summary</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="flex items-center justify-between mb-6 print:block">
+              <h2 className="text-2xl font-bold text-blue-400 print:text-black">Pickup Summary</h2>
+              <button
+                onClick={handlePrint}
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition print:hidden"
+                title="Print pickup details and wiring diagrams"
+              >
+                <Printer size={20} />
+                Print
+              </button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-6">
               {pickups.map((pickup, idx) => (
                 <div key={pickup.id} className="bg-gray-700 rounded-lg p-6 print:border print:border-gray-300 print:bg-white">
                   <h3 className="text-xl font-bold text-blue-300 mb-4 print:text-black">
@@ -2413,7 +2485,7 @@ function HumbuckerAnalyzer() {
                     
                     <div>
                       <span className="text-gray-400 print:text-gray-700">Phase:</span>
-                      <span className="text-white ml-2 font-semibold print:text-black">{pickup.coils.north.phase}</span>
+                      <span className="text-white ml-2 font-semibold print:text-black">{getPhaseDisplay(pickup.coils.north.phase)}</span>
                     </div>
                     
                     <div className="border-t border-gray-700 pt-3 mt-3 print:border-gray-300">
