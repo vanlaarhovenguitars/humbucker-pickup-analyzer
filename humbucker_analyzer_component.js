@@ -1779,14 +1779,14 @@ function HumbuckerAnalyzer() {
               
               {/* Custom Manual Input Fields */}
               {wizardData[`pickup${wizardStep}`].isCustom && (
-                <div className="bg-gray-700 rounded-lg p-4 space-y-4">
-                  <h3 className="font-bold text-yellow-400">Manual Wire Color Input</h3>
+                <div className="bg-gray-700 rounded-lg p-3 md:p-4 space-y-2 md:space-y-4">
+                  <h3 className="text-sm md:text-base font-bold text-yellow-400">Manual Wire Color Input</h3>
 
                   {/* Brand and Name Input Fields */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-2 md:gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Pickup Brand/Manufacturer (optional)
+                      <label className="block text-xs md:text-sm font-medium text-gray-300 mb-1">
+                        Brand (optional)
                       </label>
                       <input
                         type="text"
@@ -1798,13 +1798,13 @@ function HumbuckerAnalyzer() {
                             customBrand: e.target.value
                           }
                         })}
-                        placeholder="e.g., Custom Shop, DIY, etc."
-                        className="w-full bg-gray-600 text-white border border-gray-500 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g., Custom Shop"
+                        className="w-full bg-gray-600 text-white border border-gray-500 rounded px-2 md:px-3 py-1 md:py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Pickup Name/Model (optional)
+                      <label className="block text-xs md:text-sm font-medium text-gray-300 mb-1">
+                        Model (optional)
                       </label>
                       <input
                         type="text"
@@ -1816,8 +1816,8 @@ function HumbuckerAnalyzer() {
                             customName: e.target.value
                           }
                         })}
-                        placeholder="e.g., Hot Bridge, Custom Neck, etc."
-                        className="w-full bg-gray-600 text-white border border-gray-500 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g., Hot Bridge"
+                        className="w-full bg-gray-600 text-white border border-gray-500 rounded px-2 md:px-3 py-1 md:py-2 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
                   </div>
@@ -1911,10 +1911,10 @@ function HumbuckerAnalyzer() {
                   })()}
 
                   {/* North Coil */}
-                  <div className="space-y-2">
+                  <div className="space-y-1 md:space-y-2">
                     <div className="flex items-center justify-between">
-                      <div className="font-semibold text-white">North Coil</div>
-                      <div className="flex items-center gap-2">
+                      <div className="text-sm md:text-base font-semibold text-white">North Coil</div>
+                      <div className="flex items-center gap-1 md:gap-2">
                         <label className="text-xs text-gray-400">Pole Type:</label>
                         <select
                           value={wizardData[`pickup${wizardStep}`].northPoleType}
@@ -1932,7 +1932,7 @@ function HumbuckerAnalyzer() {
                         </select>
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-2 md:gap-3">
                       <div>
                         <label className="text-xs text-gray-300 block mb-1">
                           <span className="text-red-400 font-semibold">RED lead (+)</span> - Start Wire
@@ -1989,8 +1989,8 @@ function HumbuckerAnalyzer() {
                       const noSelection = !currentPhase;
 
                       return (
-                        <div className="mt-2">
-                          <div className="text-xs text-gray-300 mb-2">North Coil Phase Test:</div>
+                        <div className="mt-1 md:mt-2">
+                          <div className="text-xs text-gray-300 mb-1">North Coil Phase Test:</div>
                           <div className="flex items-center gap-2 bg-gray-800 rounded-full p-1 relative">
                             {/* Sliding background */}
                             {!noSelection && (
@@ -2025,10 +2025,10 @@ function HumbuckerAnalyzer() {
                   </div>
                   
                   {/* South Coil */}
-                  <div className="space-y-2">
+                  <div className="space-y-1 md:space-y-2">
                     <div className="flex items-center justify-between">
-                      <div className="font-semibold text-white">South Coil</div>
-                      <div className="flex items-center gap-2">
+                      <div className="text-sm md:text-base font-semibold text-white">South Coil</div>
+                      <div className="flex items-center gap-1 md:gap-2">
                         <label className="text-xs text-gray-400">Pole Type:</label>
                         <select
                           value={wizardData[`pickup${wizardStep}`].southPoleType}
@@ -2046,7 +2046,7 @@ function HumbuckerAnalyzer() {
                         </select>
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-2 md:gap-3">
                       <div>
                         <label className="text-xs text-gray-300 block mb-1">
                           <span className="text-red-400 font-semibold">RED lead (+)</span> - Start Wire
@@ -2103,8 +2103,8 @@ function HumbuckerAnalyzer() {
                       const noSelection = !currentPhase;
 
                       return (
-                        <div className="mt-2">
-                          <div className="text-xs text-gray-300 mb-2">South Coil Phase Test:</div>
+                        <div className="mt-1 md:mt-2">
+                          <div className="text-xs text-gray-300 mb-1">South Coil Phase Test:</div>
                           <div className="flex items-center gap-2 bg-gray-800 rounded-full p-1 relative">
                             {/* Sliding background */}
                             {!noSelection && (
