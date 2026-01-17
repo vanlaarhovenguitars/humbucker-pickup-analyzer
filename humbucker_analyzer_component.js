@@ -173,8 +173,8 @@ function HumbuckerAnalyzer() {
         ],
         question: 'Which LED lit up on the Phase Checker?',
         phaseOptions: [
-          { value: '🔴 Red', label: 'Red (Negative Phase)', display: '🔴 Red (Negative Phase)' },
-          { value: '🟢 Green', label: 'Green (Positive Phase)', display: '🟢 Green (Positive Phase)' }
+          { value: '🔴 Red', label: '🔴 Red (Negative Phase)', display: '🔴 Red (Negative Phase)' },
+          { value: '🟢 Green', label: '🟢 Green (Positive Phase)', display: '🟢 Green (Positive Phase)' }
         ],
         visualNote: 'RED LED = LEFT arrow | GREEN LED = RIGHT arrow in the pickup visualizer.',
         visualMappings: [
