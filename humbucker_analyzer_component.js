@@ -2592,7 +2592,7 @@ function HumbuckerAnalyzer() {
 
         {/* Individual Pickup Sections */}
         {pickups.map((pickup, pickupIndex) => (
-          <div key={pickup.id} className="mb-8 print:page-break-before">
+          <div key={pickup.id} className="mb-8 print:page-break-before print:hidden">
             {/* Pickup Header */}
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold text-blue-400 print:text-black">
@@ -2764,7 +2764,7 @@ function HumbuckerAnalyzer() {
         ))}
 
         {/* Testing Guide */}
-        <div className="bg-gray-800 rounded-lg p-6 print:border print:border-gray-300 print:page-break-before">
+        <div className="bg-gray-800 rounded-lg p-6 print:border print:border-gray-300 print:page-break-before print:hidden">
           <h2 className="text-xl font-semibold mb-4 text-yellow-400 print:text-black">Testing Guide</h2>
           
           <div className="space-y-4 text-gray-300 text-sm print:text-black">
