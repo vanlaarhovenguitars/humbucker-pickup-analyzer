@@ -112,7 +112,7 @@ function HumbuckerAnalyzer() {
   const getPhaseInstructions = (method) => {
     const instructions = {
       analog: {
-        title: '⚡ Analog Meter Phase Testing Instructions',
+        title: 'Analog Meter Phase Testing Instructions',
         deviceSetup: [
           'Set analog meter to lowest DC voltage range',
           'Analog meters use a moving needle indicator'
@@ -136,7 +136,7 @@ function HumbuckerAnalyzer() {
         ]
       },
       digital: {
-        title: '⚡ Digital Multimeter Phase Testing Instructions',
+        title: 'Digital Multimeter Phase Testing Instructions',
         deviceSetup: [
           'Set digital multimeter to DC voltage (lowest range)',
           'Digital meters show positive (+) or negative (-) values'
@@ -160,7 +160,7 @@ function HumbuckerAnalyzer() {
         ]
       },
       naudio: {
-        title: '⚡ N-Audio Phase Checker Instructions',
+        title: 'N-Audio Phase Checker Instructions',
         deviceSetup: [
           'Professional pickup phase testing device',
           'Learn more: N-Audio Guitar Pickup Phase Checker'
@@ -1363,7 +1363,7 @@ function HumbuckerAnalyzer() {
       {showPhaseCheckModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 print:hidden">
           <div className="bg-gray-800 rounded-lg p-6 max-w-md border-2 border-blue-500">
-            <h3 className="text-xl font-bold text-blue-400 mb-4">⚡ Phase & Wiring Check</h3>
+            <h3 className="text-xl font-bold text-blue-400 mb-4">Phase & Wiring Check</h3>
             <p className="text-gray-300 mb-4">
               Before applying this preset, please verify the pickup wiring and phase direction.
             </p>
@@ -1708,8 +1708,8 @@ function HumbuckerAnalyzer() {
                           onClick={() => setShowInstructions(!showInstructions)}
                           className="w-full flex items-center justify-between text-left hover:bg-gray-600 rounded p-2 -m-2 transition"
                         >
-                          <h3 className="font-bold text-yellow-400 flex items-center gap-2">
-                            <span className="text-xl">⚡</span> {instructions.title}
+                          <h3 className="font-bold text-yellow-400">
+                            {instructions.title}
                           </h3>
                           <span className="text-yellow-400 text-xl">
                             {showInstructions ? '−' : '+'}
@@ -2042,8 +2042,8 @@ function HumbuckerAnalyzer() {
                       onClick={() => setShowInstructions(!showInstructions)}
                       className="w-full flex items-center justify-between text-left hover:bg-gray-600 rounded p-2 -m-2 transition"
                     >
-                      <h3 className="font-bold text-yellow-400 flex items-center gap-2">
-                        <span className="text-xl">⚡</span> {instructions.title}
+                      <h3 className="font-bold text-yellow-400">
+                        {instructions.title}
                       </h3>
                       <span className="text-yellow-400 text-xl">
                         {showInstructions ? '−' : '+'}
