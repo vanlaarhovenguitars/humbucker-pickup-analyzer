@@ -169,6 +169,7 @@ function HumbuckerAnalyzer() {
           { text: 'Connect coil start wire to Phase Checker input', highlight: null },
           { text: 'Connect coil finish wire to Phase Checker ground', highlight: null },
           { text: 'Power on the N-Audio Phase Checker device', highlight: null },
+          { text: 'Tap on the pickup with a large flat metal object', highlight: 'yellow' },
           { text: 'Read the LED indicator color', highlight: null }
         ],
         question: 'Which LED lit up on the Phase Checker?',
@@ -2046,6 +2047,9 @@ function HumbuckerAnalyzer() {
                           <>
                             <div className="ml-4">
                               • Power on the N-Audio Phase Checker device
+                            </div>
+                            <div className="ml-4">
+                              • <span className="text-yellow-300 font-semibold">Tap on the pickup with a large flat metal object</span>
                             </div>
                             <div className="ml-4">
                               • Read the LED indicator color
